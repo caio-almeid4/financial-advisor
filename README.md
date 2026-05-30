@@ -9,21 +9,26 @@ POC of an AI-powered pipeline that generates personalized monthly investment rep
 ```mermaid
 flowchart TD
     subgraph inputs["Input files (inputs/&lt;client&gt;/)"]
-        P[portfolio.txt]
-        R[risk_profile.txt]
-        M[macro.txt]
+        P[portfolio.pdf/.txt]
+        R[risk_profile.pdf/.txt]
+        M[macro.pdf/.txt]
+        W[watchlist.csv\noptional]
     end
 
-    subgraph stage1["Stage 1 — Ingestion (gpt-4o)"]
-        P --> PP[Portfolio parser]
-        R --> RP[Risk profile parser]
-        M --> MP[Macro analysis parser]
+    subgraph stage1["Stage 1 — Ingestion (gpt-5.4-mini)"]
+        P --> PB[pdfplumber\nor read_text]
+        R --> PB
+        M --> PB
+        PB --> PP[Portfolio parser]
+        PB --> RP[Risk profile parser]
+        PB --> MP[Macro analysis parser]
     end
 
     subgraph stage2["Stage 2 & 3 — Market data"]
         PP --> YF[Yahoo Finance\nstock returns · Ibovespa]
         PP --> CVM[CVM API\nfund daily NAVs]
         BCB[BCB API\nCDI · IPCA]
+        W --> WL[load_watchlist\nenrich with live prices]
     end
 
     subgraph stage4["Stage 4 — Portfolio analysis (deterministic)"]
@@ -37,21 +42,22 @@ flowchart TD
         CALC --> ALLOC[Allocation gaps\nvs. target]
     end
 
-    subgraph stage5["Stage 5 — Recommendations (gpt-4o)"]
+    subgraph stage5["Stage 5 — Recommendations (gpt-5.4)"]
         FLAGS --> REC[Chain-of-thought\nrecommendations]
         LIQ --> REC
         ALLOC --> REC
         MP --> REC
         RP --> REC
+        WL --> REC
     end
 
-    subgraph stage6["Stage 6 — Letter (gpt-4o)"]
+    subgraph stage6["Stage 6 — Letter (gpt-4.1)"]
         REC --> LETTER[Client letter\nBrazilian Portuguese\nfirst-person advisor voice]
     end
 
     subgraph stage7["Stage 7 — PDF generation (Playwright)"]
         LETTER --> CLIENT[report_&lt;client&gt;_&lt;month&gt;.pdf\nLetter · SVG charts · sign-off]
-        REC --> ADVISOR[advisor_&lt;client&gt;_&lt;month&gt;.pdf\nInternal one-pager]
+        REC --> ADVISOR[advisor_&lt;client&gt;_&lt;month&gt;.pdf\nInternal one-pager · ticker badges]
     end
 
     subgraph obs["Observability"]
@@ -61,15 +67,15 @@ flowchart TD
 
 **7-stage pipeline:**
 
-| # | Stage | Description |
-|---|-------|-------------|
-| 1 | Ingestion | gpt-4o extracts structured data from the three input TXTs |
-| 2 | Stock prices | Monthly returns fetched from Yahoo Finance |
-| 3 | Fund NAVs & benchmarks | Daily NAVs from CVM public API; CDI, IPCA, Ibovespa |
-| 4 | Portfolio analysis | Deterministic: allocation gaps, liquidity buffer, flags |
-| 5 | Recommendations | gpt-4o generates investment recommendations with chain-of-thought |
-| 6 | Client letter | gpt-4o writes a personalized letter in Brazilian Portuguese |
-| 7 | PDF generation | Playwright (Chromium) renders two PDFs with inline SVG charts |
+| # | Stage | Model | Description |
+|---|-------|-------|-------------|
+| 1 | Ingestion | gpt-5.4-mini | Parses portfolio, risk profile, and macro files (.pdf or .txt via pdfplumber) |
+| 2 | Stock prices | — | Monthly returns fetched from Yahoo Finance |
+| 3 | Fund NAVs & benchmarks | — | Daily NAVs from CVM public API; CDI/IPCA from BCB; Ibovespa from Yahoo Finance |
+| 4 | Portfolio analysis | — | Deterministic: allocation gaps, liquidity buffer, flags, watchlist enrichment |
+| 5 | Recommendations | gpt-5.4 | Chain-of-thought recommendations; ticker suggestions from advisor watchlist |
+| 6 | Client letter | gpt-4.1 | Personalized letter in Brazilian Portuguese; ticker_suggestion excluded |
+| 7 | PDF generation | — | Playwright (Chromium) renders two PDFs with inline SVG charts |
 
 **Outputs:**
 - `output/report_<client>_<month>.pdf` — client-facing report with letter and charts
