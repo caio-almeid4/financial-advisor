@@ -2,13 +2,14 @@
 Entry point for the XP AI Financial Advisor pipeline.
 
 Usage:
-    uv run python main.py \\
-        --portfolio  "XP - Albert's portfolio.txt" \\
-        --risk-profile "XP - Albert's risk profile.txt" \\
-        --macro "XP - Macro analysis.txt"
+    uv run python main.py --input-dir inputs/albert
 
-All paths default to files in the project root, so bare `uv run python main.py`
-works out of the box for the example client.
+Each input directory must contain three files:
+    portfolio.txt      — client portfolio TXT export
+    risk_profile.txt   — client risk/suitability profile TXT
+    macro.txt          — XP monthly macro analysis TXT
+
+Defaults to inputs/albert so bare `uv run python main.py` works out of the box.
 """
 
 import argparse
@@ -43,36 +44,18 @@ def _parse_args() -> argparse.Namespace:
         description="XP AI Financial Advisor — generate a monthly PDF report for a client."
     )
     parser.add_argument(
-        "--portfolio",
+        "--input-dir",
         type=Path,
-        default=_ROOT / "XP - Albert's portfolio.txt",
-        help="Path to the client portfolio TXT export.",
-    )
-    parser.add_argument(
-        "--risk-profile",
-        type=Path,
-        dest="risk_profile",
-        default=_ROOT / "XP - Albert's risk profile.txt",
-        help="Path to the client risk profile TXT.",
-    )
-    parser.add_argument(
-        "--macro",
-        type=Path,
-        default=_ROOT / "XP - Macro analysis.txt",
-        help="Path to the XP macro analysis TXT.",
-    )
-    parser.add_argument(
-        "--watchlist",
-        type=Path,
-        default=_ROOT / "profitability_calc_wip.csv",
-        help="Path to the watchlist CSV.",
+        dest="input_dir",
+        default=_ROOT / "inputs" / "albert",
+        help="Folder containing portfolio.txt, risk_profile.txt, and macro.txt.",
     )
     parser.add_argument(
         "--output-dir",
         type=Path,
         dest="output_dir",
         default=_ROOT / "output",
-        help="Directory where the PDF will be saved.",
+        help="Directory where the PDFs will be saved.",
     )
     return parser.parse_args()
 
@@ -110,7 +93,11 @@ def _step(n: int, label: str) -> None:
 def main() -> None:
     args = _parse_args()
 
-    for path in (args.portfolio, args.risk_profile, args.macro, args.watchlist):
+    portfolio_path    = args.input_dir / "portfolio.txt"
+    risk_profile_path = args.input_dir / "risk_profile.txt"
+    macro_path        = args.input_dir / "macro.txt"
+
+    for path in (portfolio_path, risk_profile_path, macro_path):
         if not path.exists():
             print(f"Error: file not found — {path}", file=sys.stderr)
             sys.exit(1)
@@ -124,7 +111,7 @@ def main() -> None:
     # ── Stage 1: Ingestion ──────────────────────────────────────────────────
     _step(1, "Parsing input files (LLM)")
     portfolio, risk_profile, macro = load_all_inputs(
-        args.portfolio, args.risk_profile, args.macro
+        portfolio_path, risk_profile_path, macro_path
     )
     year, month = _parse_reference_date(portfolio.reference_date)
     print(
