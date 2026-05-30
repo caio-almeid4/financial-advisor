@@ -148,9 +148,11 @@ When present, the recommendations LLM picks tickers from this list to populate t
 
 ---
 
-## Regulatory note
+## Design note — ticker recommendations
 
-This system does **not** recommend specific equity tickers for purchase. Buy/add recommendations describe investment theses and categories only (e.g. "increase allocation to post-fixed fixed income"). The human advisor makes specific stock selections in the client meeting. This constraint is enforced in the recommendations prompt per CVM guidelines.
+Specific tickers appear **only in the advisor PDF**, never in the client letter.
+
+The reason is risk management, not regulation: the AI may lack context about the client's full tax situation, assets held outside XP, or liquidity constraints. The advisor reviews the `ticker_suggestion` field privately and makes the final call before the client meeting. The watchlist ensures suggestions come from a pre-vetted set of assets the advisor already monitors, not arbitrary LLM output.
 
 ---
 
