@@ -32,6 +32,7 @@ from src.data.market import (
     lookup_fund_cnpj,
 )
 from src.ingestion.parser import load_all_inputs
+from src.ingestion.reader import find_input
 from src.llm.recommendations import generate_recommendations
 from src.llm.writer import write_letter
 from src.report.generator import generate_report, generate_advisor_report
@@ -48,7 +49,7 @@ def _parse_args() -> argparse.Namespace:
         type=Path,
         dest="input_dir",
         default=_ROOT / "inputs" / "albert",
-        help="Folder containing portfolio.txt, risk_profile.txt, and macro.txt.",
+        help="Folder with portfolio, risk_profile, and macro files (.pdf or .txt, auto-detected).",
     )
     parser.add_argument(
         "--output-dir",
@@ -93,14 +94,13 @@ def _step(n: int, label: str) -> None:
 def main() -> None:
     args = _parse_args()
 
-    portfolio_path    = args.input_dir / "portfolio.txt"
-    risk_profile_path = args.input_dir / "risk_profile.txt"
-    macro_path        = args.input_dir / "macro.txt"
-
-    for path in (portfolio_path, risk_profile_path, macro_path):
-        if not path.exists():
-            print(f"Error: file not found — {path}", file=sys.stderr)
-            sys.exit(1)
+    try:
+        portfolio_path    = find_input(args.input_dir, "portfolio")
+        risk_profile_path = find_input(args.input_dir, "risk_profile")
+        macro_path        = find_input(args.input_dir, "macro")
+    except FileNotFoundError as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
 
     run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
     setup_logging(_ROOT / "logs", run_id)

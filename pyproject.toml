@@ -15,6 +15,7 @@ dependencies = [
     "playwright>=1.44",
     "python-dotenv>=1.0",
     "rapidfuzz>=3.0",
+    "pdfplumber>=0.11.9",
 ]
 
 [project.optional-dependencies]

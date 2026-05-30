@@ -12,6 +12,7 @@ from src.prompts import portfolio as portfolio_prompts
 from src.prompts import risk_profile as risk_prompts
 
 from .models import MacroAnalysis, Portfolio, RiskProfile
+from .reader import read_input
 
 client = OpenAI()
 _MODEL = "gpt-4o-mini"
@@ -41,19 +42,19 @@ def _parse(model_class, system_prompt: str, text: str, stage: str):
     return completion.choices[0].message.parsed
 
 
-def parse_portfolio(txt_path: Path) -> Portfolio:
+def parse_portfolio(path: Path) -> Portfolio:
     return _parse(Portfolio, portfolio_prompts.SYSTEM,
-                  txt_path.read_text(encoding="utf-8"), "ingestion_portfolio")
+                  read_input(path), "ingestion_portfolio")
 
 
-def parse_risk_profile(txt_path: Path) -> RiskProfile:
+def parse_risk_profile(path: Path) -> RiskProfile:
     return _parse(RiskProfile, risk_prompts.SYSTEM,
-                  txt_path.read_text(encoding="utf-8"), "ingestion_risk_profile")
+                  read_input(path), "ingestion_risk_profile")
 
 
-def parse_macro_analysis(txt_path: Path) -> MacroAnalysis:
+def parse_macro_analysis(path: Path) -> MacroAnalysis:
     return _parse(MacroAnalysis, macro_prompts.SYSTEM,
-                  txt_path.read_text(encoding="utf-8"), "ingestion_macro")
+                  read_input(path), "ingestion_macro")
 
 
 def load_all_inputs(
