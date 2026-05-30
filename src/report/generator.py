@@ -67,13 +67,45 @@ def _format_pct(value: float | None) -> tuple[str, str]:
     return text, css
 
 
+_A4_WIDTH_PX  = 794   # 210mm at 96dpi
+_PAGE1_MAX_PX = 1040  # A4 height (1122px) minus 20mm bottom margin (76px), with 6px safety buffer
+
+_LETTER_FONT_SIZES = ["9.5pt", "9pt", "8.5pt", "8pt", "7.5pt"]
+
+
+def _fit_letter_to_page(page) -> None:
+    """Shrink .letter font size until the section-divider sits within page 1.
+
+    Uses the natural document flow position of .section-divider as a proxy:
+    if its top offset exceeds the first-page height, the letter is spilling
+    onto page 2, which would push the charts to page 3.
+    No-op for templates that don't have .letter or .section-divider (e.g. advisor PDF).
+    """
+    has_elements = page.evaluate(
+        "() => !!(document.querySelector('.letter') && document.querySelector('.section-divider'))"
+    )
+    if not has_elements:
+        return
+
+    for size in _LETTER_FONT_SIZES:
+        page.evaluate(
+            f"document.querySelector('.letter').style.fontSize = '{size}'"
+        )
+        top = page.evaluate(
+            "document.querySelector('.section-divider').getBoundingClientRect().top"
+        )
+        if top <= _PAGE1_MAX_PX:
+            return
+
+
 def _html_to_pdf(html: str, output_path: Path) -> None:
     """Render HTML to PDF using Playwright (Chromium). Supports full modern CSS."""
     from playwright.sync_api import sync_playwright
     with sync_playwright() as p:
         browser = p.chromium.launch()
-        page = browser.new_page()
+        page = browser.new_page(viewport={"width": _A4_WIDTH_PX, "height": 1122})
         page.set_content(html, wait_until="networkidle")
+        _fit_letter_to_page(page)
         page.pdf(
             path=str(output_path),
             format="A4",
