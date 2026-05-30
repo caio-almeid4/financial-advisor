@@ -11,7 +11,7 @@ from src.llm.models import PortfolioRecommendations
 from src.report.charts import allocation_chart, returns_chart
 
 _TEMPLATE_DIR = Path(__file__).parent
-_LOGO_PATH = Path(__file__).parents[2] / "XP_Investimentos_logo.png"
+_LOGO_PATH = Path(__file__).parents[2] / "assets" / "logo.png"
 _OUTPUT_DIR = Path(__file__).parents[2] / "output"
 
 _FOOTER_HTML = (
