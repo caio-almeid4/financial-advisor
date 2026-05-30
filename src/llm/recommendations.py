@@ -21,7 +21,7 @@ def _build_user_message(
 ) -> str:
     return json.dumps({
         "investable_balance_brl": analysis.investable_balance,
-        "portfolio_analysis": analysis.model_dump(exclude={"watchlist"}),
+        "portfolio_analysis": analysis.model_dump(),
         "risk_profile": {
             "classification": risk_profile.classification,
             "compatible_products": risk_profile.compatible_products,

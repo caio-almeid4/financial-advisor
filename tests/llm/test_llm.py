@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.analysis.models import AllocationStatus, AssetReturn, PortfolioAnalysis, WatchlistItem
+from src.analysis.models import AllocationStatus, AssetReturn, PortfolioAnalysis
 from src.ingestion.models import MacroAnalysis, MacroProjections, RiskProfile, TargetAllocation
 from src.llm.models import AssetRecommendation, PortfolioRecommendations
 from src.llm.recommendations import _build_user_message as build_rec_message
@@ -44,9 +44,6 @@ def make_analysis() -> PortfolioAnalysis:
                              target_pct=0.20, gap_pct=-0.01),
         ],
         flags=["HAPV3 acumula -74.6% desde a compra"],
-        watchlist=[
-            WatchlistItem(ticker="ITUB4", current_price=27.8, monthly_return_pct=3.3, in_portfolio=False),
-        ],
     )
 
 

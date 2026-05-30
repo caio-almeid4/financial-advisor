@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 import pytest
 
-from src.analysis.models import AllocationStatus, AssetReturn, PortfolioAnalysis, WatchlistItem
+from src.analysis.models import AllocationStatus, AssetReturn, PortfolioAnalysis
 from src.llm.models import AssetRecommendation, PortfolioRecommendations
 from src.report.charts import allocation_chart, returns_chart
 from src.report.generator import (
@@ -46,9 +46,6 @@ def make_analysis() -> PortfolioAnalysis:
             AllocationStatus(asset_class="fundos_acoes", current_pct=0.11, target_pct=0.15, gap_pct=-0.04),
         ],
         flags=["HAPV3 acumula -74.6% desde a compra"],
-        watchlist=[
-            WatchlistItem(ticker="ITUB4", current_price=27.8, monthly_return_pct=3.3, in_portfolio=False),
-        ],
     )
 
 

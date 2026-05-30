@@ -18,13 +18,6 @@ class AllocationStatus(BaseModel):
     gap_pct: float  # current - target; positive = overweight, negative = underweight
 
 
-class WatchlistItem(BaseModel):
-    ticker: str
-    current_price: float
-    monthly_return_pct: float
-    in_portfolio: bool
-
-
 class PortfolioAnalysis(BaseModel):
     client_name: str
     reference_month: str          # e.g. "abril de 2025"
@@ -45,4 +38,3 @@ class PortfolioAnalysis(BaseModel):
 
     allocation_status: list[AllocationStatus]
     flags: list[str]
-    watchlist: list[WatchlistItem]

@@ -11,7 +11,7 @@ from src.analysis.calculator import (
     _weighted_portfolio_return,
     analyze_portfolio,
     classify_fund,
-    load_watchlist,
+
 )
 from src.analysis.models import AssetReturn, AllocationStatus
 from src.ingestion.models import (
@@ -205,8 +205,7 @@ class TestRateParsing:
                            target_allocation=TargetAllocation(acoes_pct=0.25, renda_fixa_pct=0.25,
                                                                fundos_multimercado_pct=0.25, fundos_acoes_pct=0.25))
         benchmarks = BenchmarkData(cdi_monthly_pct=1.0, ipca_monthly_pct=0.3, ibovespa_monthly_pct=1.5)
-        result = analyze_portfolio(portfolio, risk, {}, {}, benchmarks, 0.3,
-                                   DATA_DIR / "profitability_calc_wip.csv", 2025, 5)
+        result = analyze_portfolio(portfolio, risk, {}, {}, benchmarks, 0.3, 2025, 5)
         return result.assets[0].monthly_return_pct
 
     def test_dot_decimal(self):
@@ -273,17 +272,3 @@ class TestInvestableBalance:
         assert _investable_balance(p, 0.10) == 0.0
 
 
-class TestLoadWatchlist:
-    def test_loads_from_csv(self):
-        items = load_watchlist(DATA_DIR / "profitability_calc_wip.csv")
-        assert len(items) == 12
-
-    def test_computes_monthly_return(self):
-        items = load_watchlist(DATA_DIR / "profitability_calc_wip.csv")
-        lren3 = next(i for i in items if i.ticker == "LREN3")
-        expected = (16.94 - 15.55) / 15.55 * 100
-        assert lren3.monthly_return_pct == pytest.approx(expected, rel=0.01)
-
-    def test_in_portfolio_defaults_to_false(self):
-        items = load_watchlist(DATA_DIR / "profitability_calc_wip.csv")
-        assert all(not i.in_portfolio for i in items)

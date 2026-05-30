@@ -133,8 +133,8 @@ def main() -> None:
         try:
             stock_data[stock.ticker] = get_stock_monthly_data(stock.ticker, year, month)
             print(f"           {stock.ticker}: {stock_data[stock.ticker].monthly_return_pct:+.2f}%")
-        except Exception as e:
-            print(f"           {stock.ticker}: failed ({e})", file=sys.stderr)
+        except Exception:
+            print(f"           {stock.ticker}: sem dados (possivelmente deslistado — retorno ignorado)")
 
     _step(3, "Fetching fund NAVs (CVM) and benchmarks")
     fund_data = {}
@@ -167,7 +167,6 @@ def main() -> None:
         fund_data=fund_data,
         benchmarks=benchmarks,
         ipca_monthly_pct=benchmarks.ipca_monthly_pct,
-        watchlist_path=args.watchlist,
         year=year,
         month=month,
     )

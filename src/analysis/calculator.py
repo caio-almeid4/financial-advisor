@@ -1,10 +1,7 @@
 import calendar
-from pathlib import Path
-
-import pandas as pd
 
 from src.analysis.flags import generate_flags
-from src.analysis.models import AllocationStatus, AssetReturn, PortfolioAnalysis, WatchlistItem
+from src.analysis.models import AllocationStatus, AssetReturn, PortfolioAnalysis
 from src.data.market import BenchmarkData, FundMonthlyData, StockMonthlyData, get_cdb_monthly_return_pct
 from src.ingestion.models import Fund, Portfolio, RiskProfile, TargetAllocation
 
@@ -130,20 +127,6 @@ def _investable_balance(portfolio: Portfolio, buffer_pct: float) -> float:
     return round(max(0.0, portfolio.available_balance - total * buffer_pct), 2)
 
 
-def load_watchlist(csv_path: Path) -> list[WatchlistItem]:
-    df = pd.read_csv(csv_path)
-    items = []
-    for _, row in df.iterrows():
-        monthly_return = (row["Current price"] - row["Last month price"]) / row["Last month price"] * 100
-        items.append(WatchlistItem(
-            ticker=row["Asset"],
-            current_price=row["Current price"],
-            monthly_return_pct=round(monthly_return, 2),
-            in_portfolio=False,  # flagged later in analyze_portfolio
-        ))
-    return items
-
-
 def analyze_portfolio(
     portfolio: Portfolio,
     risk_profile: RiskProfile,
@@ -151,7 +134,6 @@ def analyze_portfolio(
     fund_data: dict[str, FundMonthlyData],
     benchmarks: BenchmarkData,
     ipca_monthly_pct: float,
-    watchlist_path: Path,
     year: int,
     month: int,
 ) -> PortfolioAnalysis:
@@ -217,12 +199,6 @@ def analyze_portfolio(
     buffer_pct = _liquidity_tier(risk_profile.target_allocation)
     inv_balance = _investable_balance(portfolio, buffer_pct)
 
-    # Watchlist
-    watchlist = load_watchlist(watchlist_path)
-    portfolio_tickers = {s.ticker for s in portfolio.stocks}
-    for item in watchlist:
-        item.in_portfolio = item.ticker in portfolio_tickers
-
     # Flags
     flags = generate_flags(assets, allocation_status, cdi)
 
@@ -243,5 +219,4 @@ def analyze_portfolio(
         ibovespa_monthly_pct=benchmarks.ibovespa_monthly_pct,
         allocation_status=allocation_status,
         flags=flags,
-        watchlist=watchlist,
     )
