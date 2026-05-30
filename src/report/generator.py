@@ -39,15 +39,26 @@ def _md_to_html(text: str) -> str:
     return re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", text)
 
 
+_SIGN_OFF_RE = re.compile(
+    r"(atenciosamente|um abraço|abraços|cordialmente|até breve)", re.IGNORECASE
+)
+
+
 def _split_paragraphs(letter: str) -> list[str]:
     """Split letter on blank lines, converting markdown and stripping sign-off/placeholders."""
     paras = [p.strip() for p in re.split(r"\n{2,}", letter) if p.strip()]
+    # Cut at any sign-off paragraph
     cutoff = next(
-        (i for i, p in enumerate(paras) if re.match(r"atenciosamente", p, re.IGNORECASE)),
+        (i for i, p in enumerate(paras) if _SIGN_OFF_RE.match(p)),
         len(paras),
     )
     paras = paras[:cutoff]
+    # Remove paragraphs that are entirely a placeholder
     paras = [p for p in paras if not re.fullmatch(r"\[.*?\]", p, re.DOTALL)]
+    # Strip inline placeholders like "[Assinatura do Consultor]" within a paragraph
+    paras = [re.sub(r"\s*\[.*?\]", "", p).strip() for p in paras]
+    # Drop any paragraph that became empty after stripping
+    paras = [p for p in paras if p]
     return [_md_to_html(p) for p in paras]
 
 

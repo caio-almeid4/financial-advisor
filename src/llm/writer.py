@@ -1,5 +1,6 @@
 import json
 import time
+from datetime import datetime
 
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -13,12 +14,26 @@ load_dotenv()
 client = OpenAI()
 
 
+_MONTH_PT = {
+    1: "janeiro", 2: "fevereiro", 3: "março", 4: "abril",
+    5: "maio", 6: "junho", 7: "julho", 8: "agosto",
+    9: "setembro", 10: "outubro", 11: "novembro", 12: "dezembro",
+}
+
+
+def _today_pt() -> str:
+    """Return today's date formatted in Brazilian Portuguese, e.g. '30 de maio de 2026'."""
+    now = datetime.now()
+    return f"{now.day} de {_MONTH_PT[now.month]} de {now.year}"
+
+
 def _build_user_message(
     recommendations: PortfolioRecommendations,
     analysis: PortfolioAnalysis,
 ) -> str:
     return json.dumps({
         "client_name": analysis.client_name,
+        "report_date": _today_pt(),
         "reference_month": analysis.reference_month,
         "total_invested": analysis.total_invested,
         "available_balance": analysis.available_balance,
