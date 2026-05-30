@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
+<style>
+  @page {
+    size: A4;
+    margin: 0 0 16mm 0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --yellow:  #FFD100;
+    --dark:    #0A0A0A;
+    --ink:     #111111;
+    --body:    #2D2D2D;
+    --muted:   #888888;
+    --border:  #E8E8E8;
+    --bg-soft: #F7F7F7;
+  }
+
+  body {
+    font-family: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 9.5pt;
+    color: var(--body);
+    line-height: 1.65;
+    background: #fff;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* ─── HEADER ──────────────────────────────────────────────── */
+  .header {
+    background: var(--dark);
+    padding: 0 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 68px;
+  }
+  .header-logo { height: 38px; width: auto; }
+  .header-right { text-align: right; }
+  .header-title {
+    font-size: 12pt;
+    font-weight: 700;
+    color: #FFFFFF;
+    letter-spacing: -0.3px;
+    line-height: 1.2;
+  }
+  .header-subtitle {
+    font-size: 7.5pt;
+    color: var(--yellow);
+    font-weight: 600;
+    margin-top: 4px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+  }
+
+  /* yellow accent line below header */
+  .header-accent {
+    height: 3px;
+    background: var(--yellow);
+  }
+
+  /* ─── KPI STRIP ───────────────────────────────────────────── */
+  .kpi-strip {
+    display: flex;
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+  }
+  .kpi-item {
+    flex: 1;
+    padding: 11px 20px 10px;
+    border-right: 1px solid var(--border);
+  }
+  .kpi-item:last-child { border-right: none; }
+  .kpi-label {
+    font-size: 6.5pt;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.9px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .kpi-value {
+    font-size: 15pt;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--ink);
+    letter-spacing: -0.5px;
+  }
+  .kpi-value.positive { color: #1A7A40; }
+  .kpi-value.negative { color: #C0392B; }
+  .kpi-value.neutral  { color: var(--ink); }
+
+  /* ─── BODY ────────────────────────────────────────────────── */
+  .body-wrap { padding: 24px 28px 0; }
+
+  /* ─── LETTER HEADER ───────────────────────────────────────── */
+  .letter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .letter-date {
+    font-size: 8pt;
+    color: var(--muted);
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    margin-bottom: 5px;
+  }
+  .letter-client {
+    font-size: 15pt;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.4px;
+  }
+  .letter-advisor {
+    text-align: right;
+    font-size: 8pt;
+    line-height: 1.6;
+  }
+  .letter-advisor-label {
+    color: var(--muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 6.5pt;
+    margin-bottom: 2px;
+  }
+  .letter-advisor-name {
+    color: var(--ink);
+    font-weight: 600;
+    font-size: 9pt;
+  }
+
+  /* ─── LETTER BODY ─────────────────────────────────────────── */
+  .letter p {
+    margin-bottom: 9px;
+    color: var(--body);
+    text-align: justify;
+    font-size: 9.5pt;
+  }
+  .letter p:last-child { margin-bottom: 0; }
+
+  /* ─── SIGN-OFF ────────────────────────────────────────────── */
+  .sign-off {
+    margin-top: 12px;
+    font-size: 8pt;
+    color: var(--muted);
+  }
+  .sign-off strong {
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  /* ─── SECTION DIVIDER ─────────────────────────────────────── */
+  .section-divider {
+    display: flex;
+    align-items: center;
+    margin: 22px 0 16px;
+    gap: 12px;
+  }
+  .section-divider-line { flex: 1; height: 1px; background: var(--border); }
+  .section-divider-badge {
+    font-size: 6.5pt;
+    font-weight: 700;
+    color: var(--dark);
+    background: var(--yellow);
+    padding: 3px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.9px;
+    white-space: nowrap;
+  }
+
+  /* ─── CHARTS ──────────────────────────────────────────────── */
+  .chart-card {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+  .chart-card-title {
+    background: var(--bg-soft);
+    border-bottom: 1px solid var(--border);
+    padding: 7px 14px;
+    font-size: 7pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--muted);
+  }
+  .chart-card svg {
+    display: block;
+    padding: 12px 16px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<div class="header">
+  <img class="header-logo"
+       src="data:image/png;base64,{{ logo_b64 }}"
+       alt="XP Investimentos">
+  <div class="header-right">
+    <div class="header-title">Relatório Mensal de Carteira</div>
+    <div class="header-subtitle">{{ reference_month | capitalize }}</div>
+  </div>
+</div>
+<div class="header-accent"></div>
+
+<!-- ── KPI strip ── -->
+<div class="kpi-strip">
+  <div class="kpi-item">
+    <div class="kpi-label">Total Investido</div>
+    <div class="kpi-value neutral">{{ total_invested }}</div>
+  </div>
+  <div class="kpi-item">
+    <div class="kpi-label">IPCA do Mês</div>
+    <div class="kpi-value neutral">{{ ipca_monthly }}</div>
+  </div>
+  <div class="kpi-item">
+    <div class="kpi-label">CDI do Mês</div>
+    <div class="kpi-value neutral">{{ cdi_monthly }}</div>
+  </div>
+  <div class="kpi-item">
+    <div class="kpi-label">Ibovespa</div>
+    <div class="kpi-value {{ ibov_class }}">{{ ibovespa_monthly }}</div>
+  </div>
+</div>
+
+<div class="body-wrap">
+
+  <!-- ── Letter header ── -->
+  <div class="letter-header">
+    <div>
+      <div class="letter-date">{{ reference_month | capitalize }}</div>
+      <div class="letter-client">{{ client_name }}</div>
+    </div>
+    <div class="letter-advisor">
+      <div class="letter-advisor-label">Seu assessor</div>
+      <div class="letter-advisor-name">{{ advisor_name }}</div>
+    </div>
+  </div>
+
+  <!-- ── Letter body ── -->
+  <div class="letter">
+    {% for paragraph in letter_paragraphs %}
+    <p>{{ paragraph | safe }}</p>
+    {% endfor %}
+  </div>
+
+  <!-- ── Charts section ── -->
+  <div class="section-divider" style="page-break-before:always;padding-top:16px">
+    <div class="section-divider-line"></div>
+    <div class="section-divider-badge">Visão da Carteira</div>
+    <div class="section-divider-line"></div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-card-title">Alocação Atual vs. Alvo por Classe de Ativo</div>
+    {{ chart_allocation | safe }}
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-card-title">Retorno Mensal por Ativo</div>
+    {{ chart_returns | safe }}
+  </div>
+
+  <!-- ── Sign-off ── -->
+  <div class="sign-off">
+    Atenciosamente, <strong>{{ advisor_name }}</strong> · Assessor de Investimentos · XP Investimentos
+  </div>
+
+</div>
+</body>
+</html>

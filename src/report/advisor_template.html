@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4; margin: 0 0 14mm 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --yellow: #FFD100;
+    --dark:   #0A0A0A;
+    --ink:    #111111;
+    --body:   #2D2D2D;
+    --muted:  #888888;
+    --border: #E8E8E8;
+    --soft:   #F7F7F7;
+  }
+
+  body {
+    font-family: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 9pt;
+    color: var(--body);
+    line-height: 1.5;
+    background: #fff;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: var(--dark);
+    padding: 0 26px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 58px;
+  }
+  .header-logo { height: 32px; width: auto; }
+  .header-right { text-align: right; }
+  .header-title {
+    font-size: 10.5pt;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.2px;
+  }
+  .internal-badge {
+    display: inline-block;
+    margin-top: 4px;
+    background: var(--yellow);
+    color: var(--dark);
+    font-size: 6.5pt;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 2px;
+  }
+  .accent { height: 3px; background: var(--yellow); }
+
+  /* ── Body ── */
+  .wrap { padding: 16px 26px 0; }
+
+  /* ── Client / Advisor block ── */
+  .meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+  .client-name { font-size: 14pt; font-weight: 700; color: var(--ink); letter-spacing: -0.4px; }
+  .client-sub  { font-size: 8pt; color: var(--muted); margin-top: 2px; }
+  .advisor-name { font-weight: 600; font-size: 9.5pt; color: var(--ink); text-align: right; }
+  .advisor-code { font-size: 7.5pt; color: var(--muted); text-align: right; margin-top: 1px; }
+
+  /* ── Section title ── */
+  .section-title {
+    font-size: 7pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    padding-bottom: 5px;
+    border-bottom: 2px solid var(--yellow);
+    margin: 16px 0 8px;
+  }
+
+  /* ── Balance table ── */
+  .balance-table { width: 100%; border-collapse: collapse; }
+  .balance-table td {
+    padding: 5px 10px;
+    font-size: 9pt;
+    border-bottom: 1px solid var(--border);
+  }
+  .balance-table .lbl { color: var(--muted); width: 58%; }
+  .balance-table .val { font-weight: 600; text-align: right; color: var(--ink); }
+  .balance-table .total-row td {
+    background: #FFFBE6;
+    border-top: 1px solid #E8D800;
+    font-weight: 700;
+  }
+  .balance-table .total-row .lbl { color: var(--ink); }
+  .balance-table .total-row .val { font-size: 11pt; color: #7A6000; }
+
+  /* ── Flags ── */
+  .flags-list { list-style: none; padding: 0; }
+  .flags-list li {
+    padding: 5px 0 5px 14px;
+    position: relative;
+    font-size: 8.5pt;
+    border-bottom: 1px solid var(--border);
+    color: var(--body);
+  }
+  .flags-list li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #C0392B;
+  }
+  .no-flags { font-size: 8.5pt; color: var(--muted); font-style: italic; }
+
+  /* ── Recommendations table ── */
+  .rec-table { width: 100%; border-collapse: collapse; }
+  .rec-table th {
+    font-size: 7pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--muted);
+    padding: 5px 8px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    background: var(--soft);
+  }
+  .rec-table td {
+    padding: 6px 8px;
+    font-size: 8.5pt;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.4;
+  }
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-size: 7pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+  }
+  .badge-reduzir, .badge-considerar_venda { background: #FDECEA; color: #C0392B; }
+  .badge-aumentar, .badge-considerar_compra { background: #E8F5EC; color: #1A7A40; }
+  .badge-manter { background: var(--soft); color: #555; }
+
+  /* ── Assessment ── */
+  .assessment {
+    border-left: 3px solid var(--yellow);
+    padding: 8px 12px;
+    font-size: 8.5pt;
+    color: var(--body);
+    background: #FFFBE6;
+    line-height: 1.55;
+  }
+
+  /* ── Footer note ── */
+  .doc-note {
+    font-size: 7pt;
+    color: #BBBBBB;
+    margin-top: 14px;
+    border-top: 1px solid var(--border);
+    padding-top: 8px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <img class="header-logo" src="data:image/png;base64,{{ logo_b64 }}" alt="XP Investimentos">
+  <div class="header-right">
+    <div class="header-title">Resumo do Assessor</div>
+    <div><span class="internal-badge">Uso Interno</span></div>
+  </div>
+</div>
+<div class="accent"></div>
+
+<div class="wrap">
+
+  <div class="meta-row">
+    <div>
+      <div class="client-name">{{ client_name }}</div>
+      <div class="client-sub">{{ reference_month | capitalize }}</div>
+    </div>
+    <div>
+      <div class="advisor-name">{{ advisor_name }}</div>
+      <div class="advisor-code">Código {{ advisor_code }}</div>
+    </div>
+  </div>
+
+  <!-- Saldo -->
+  <div class="section-title">Saldo Disponível para Aporte</div>
+  <table class="balance-table">
+    <tr><td class="lbl">Patrimônio total</td><td class="val">{{ total_patrimony }}</td></tr>
+    <tr><td class="lbl">Total investido</td><td class="val">{{ total_invested }}</td></tr>
+    <tr><td class="lbl">Saldo disponível em conta</td><td class="val">{{ available_balance }}</td></tr>
+    <tr><td class="lbl">Reserva de liquidez ({{ liquidity_buffer_pct }} do patrimônio)</td><td class="val" style="color:var(--muted)">{{ liquidity_reserve }}</td></tr>
+    <tr class="total-row"><td class="lbl">Saldo investível</td><td class="val">{{ investable_balance }}</td></tr>
+  </table>
+
+  <!-- Alertas -->
+  <div class="section-title">Alertas Detectados{% if flags %} ({{ flags | length }}){% endif %}</div>
+  {% if flags %}
+  <ul class="flags-list">
+    {% for flag in flags %}<li>{{ flag }}</li>{% endfor %}
+  </ul>
+  {% else %}
+  <p class="no-flags">Nenhum alerta detectado neste mês.</p>
+  {% endif %}
+
+  <!-- Recomendações -->
+  <div class="section-title">Recomendações ({{ recommendations | length }})</div>
+  <table class="rec-table">
+    <thead>
+      <tr>
+        <th style="width:14%">Ação</th>
+        <th style="width:26%">Ativo / Categoria</th>
+        <th>Racional</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for rec in recommendations %}
+      <tr>
+        <td><span class="badge badge-{{ rec.action }}">{{ rec.action }}</span></td>
+        <td style="font-weight:600;color:var(--ink)">{{ rec.asset }}</td>
+        <td>{{ rec.rationale }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- Avaliação geral -->
+  <div class="section-title">Avaliação Geral</div>
+  <div class="assessment">{{ overall_assessment }}</div>
+
+  <div class="doc-note">
+    Gerado automaticamente — XP AI Advisor · {{ reference_month | capitalize }}.
+    Uso exclusivo do assessor. Não encaminhar ao cliente.
+  </div>
+
+</div>
+</body>
+</html>
