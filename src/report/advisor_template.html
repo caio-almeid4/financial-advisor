@@ -160,6 +160,18 @@
   .badge-reduzir, .badge-considerar_venda { background: #FDECEA; color: #C0392B; }
   .badge-aumentar, .badge-considerar_compra { background: #E8F5EC; color: #1A7A40; }
   .badge-manter { background: var(--soft); color: #555; }
+  .ticker-tag {
+    display: inline-block;
+    background: #FFFBE6;
+    border: 1px solid #E8D800;
+    color: #7A6000;
+    font-size: 7pt;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 2px;
+    margin-left: 5px;
+    letter-spacing: 0.3px;
+  }
 
   /* ── Assessment ── */
   .assessment {
@@ -239,7 +251,12 @@
       {% for rec in recommendations %}
       <tr>
         <td><span class="badge badge-{{ rec.action }}">{{ rec.action }}</span></td>
-        <td style="font-weight:600;color:var(--ink)">{{ rec.asset }}</td>
+        <td style="font-weight:600;color:var(--ink)">
+          {{ rec.asset }}
+          {% if rec.ticker_suggestion %}
+          <span class="ticker-tag">{{ rec.ticker_suggestion }}</span>
+          {% endif %}
+        </td>
         <td>{{ rec.rationale }}</td>
       </tr>
       {% endfor %}

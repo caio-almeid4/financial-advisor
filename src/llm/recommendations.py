@@ -18,6 +18,7 @@ def _build_user_message(
     analysis: PortfolioAnalysis,
     risk_profile: RiskProfile,
     macro: MacroAnalysis,
+    watchlist: list[dict],
 ) -> str:
     return json.dumps({
         "investable_balance_brl": analysis.investable_balance,
@@ -32,6 +33,7 @@ def _build_user_message(
             "key_points": macro.key_points,
             "projections": macro.projections.model_dump(),
         },
+        "advisor_watchlist": watchlist,
     }, ensure_ascii=False, indent=2)
 
 
@@ -39,10 +41,11 @@ def generate_recommendations(
     analysis: PortfolioAnalysis,
     risk_profile: RiskProfile,
     macro: MacroAnalysis,
+    watchlist: list[dict] | None = None,
 ) -> PortfolioRecommendations:
     messages = [
         {"role": "system", "content": prompts.SYSTEM},
-        {"role": "user", "content": _build_user_message(analysis, risk_profile, macro)},
+        {"role": "user", "content": _build_user_message(analysis, risk_profile, macro, watchlist or [])},
     ]
 
     t0 = time.perf_counter()

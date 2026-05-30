@@ -117,18 +117,34 @@ uv run python main.py --input-dir inputs/albert --output-dir /tmp/reports
 
 ## Input format
 
-Each client folder under `inputs/` must contain three files exported from XP's systems.
+Each client folder under `inputs/` must contain three files exported from XP's systems, plus an optional watchlist.
+
 Both `.pdf` and `.txt` are accepted per file — PDF takes priority if both exist, and mixing is allowed (e.g. `portfolio.pdf` + `macro.txt`).
 
 ```
 inputs/
   albert/
-    portfolio.pdf      # or portfolio.txt
-    risk_profile.pdf   # or risk_profile.txt
-    macro.pdf          # or macro.txt
+    portfolio.pdf        # or portfolio.txt
+    risk_profile.pdf     # or risk_profile.txt
+    macro.pdf            # or macro.txt
+    watchlist.csv        # optional — advisor-curated ticker list for internal suggestions
 ```
 
 The LLM parser handles free-form formatting — no rigid schema required. PDF files are processed with `pdfplumber`, which reconstructs table rows as pipe-delimited text before passing to the LLM.
+
+### watchlist.csv format
+
+```csv
+ticker,thesis
+ITUB4,Banco sólido com histórico consistente de dividendos
+EGIE3,Elétrica defensiva com dividend yield elevado e receita previsível
+PETR4,Exposição a commodities e hedge cambial natural
+```
+
+- **`ticker`** (required): B3 ticker without the `.SA` suffix
+- **`thesis`** (optional): short rationale the advisor has for monitoring this asset
+
+When present, the recommendations LLM picks tickers from this list to populate the `ticker_suggestion` field — shown as a yellow badge in the **advisor PDF only**. The client PDF always uses investment categories, never specific tickers (CVM compliance).
 
 ---
 

@@ -1,6 +1,12 @@
 from pydantic import BaseModel, model_validator
 
 
+class WatchlistItem(BaseModel):
+    ticker: str
+    monthly_return_pct: float | None  # None if delisted or no data for the period
+    thesis: str | None                # short rationale curated by the advisor in watchlist.csv
+
+
 class Stock(BaseModel):
     ticker: str
     position_value: float

@@ -3,8 +3,16 @@ from pydantic import BaseModel, Field
 
 class AssetRecommendation(BaseModel):
     action: str   # "reduzir", "aumentar", "manter", "considerar_venda", "considerar_compra"
-    asset: str    # ticker, fund name, or asset class
+    asset: str    # category or existing portfolio asset — never a specific buy ticker
     rationale: str
+    ticker_suggestion: str | None = Field(
+        default=None,
+        description=(
+            "For aumentar/considerar_compra only: a specific ticker from the advisor's watchlist "
+            "that fits the investment thesis. Shown ONLY in the internal advisor PDF — never to the client. "
+            "Null for reduce/maintain actions or when no watchlist ticker is a good fit."
+        ),
+    )
 
 
 class PortfolioRecommendations(BaseModel):

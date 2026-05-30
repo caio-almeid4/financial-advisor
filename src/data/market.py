@@ -9,12 +9,14 @@ Sources:
 
 import calendar
 import contextlib
+import csv
 import io
 import logging
 from dataclasses import dataclass, field
 from datetime import date, timedelta
 from functools import lru_cache
 from io import StringIO
+from pathlib import Path
 
 import httpx
 import pandas as pd
@@ -251,3 +253,34 @@ def get_benchmarks(year: int, month: int) -> BenchmarkData:
         ipca_monthly_pct=get_ipca_monthly_pct(year, month),
         ibovespa_monthly_pct=get_ibovespa_monthly_pct(year, month),
     )
+
+
+# --- Watchlist ---
+
+def load_watchlist(csv_path: Path, year: int, month: int) -> list[dict]:
+    """Load advisor watchlist CSV and enrich each ticker with live monthly return.
+
+    CSV format (header required):
+        ticker,thesis
+        ITUB4,Banco sólido com dividendos consistentes
+
+    The `thesis` column is optional — if omitted, thesis will be null.
+    Tickers with no price data (delisted, etc.) are included with monthly_return_pct=null.
+    """
+    items: list[dict] = []
+    with open(csv_path, newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            ticker = row["ticker"].strip()
+            thesis = row.get("thesis", "").strip() or None
+            try:
+                data = get_stock_monthly_data(ticker, year, month)
+                monthly_return = data.monthly_return_pct
+            except Exception:
+                monthly_return = None
+            items.append({
+                "ticker": ticker,
+                "monthly_return_pct": monthly_return,
+                "thesis": thesis,
+            })
+    return items

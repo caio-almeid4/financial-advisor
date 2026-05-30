@@ -28,6 +28,7 @@ from src.data.market import (
     get_benchmarks,
     get_fund_monthly_data,
     get_stock_monthly_data,
+    load_watchlist,
     lookup_fund_class,
     lookup_fund_cnpj,
 )
@@ -178,9 +179,18 @@ def main() -> None:
     if analysis.flags:
         print("         Flags  :", *analysis.flags, sep="\n                  ")
 
+    # ── Watchlist (optional) ────────────────────────────────────────────────
+    watchlist_path = args.input_dir / "watchlist.csv"
+    watchlist = []
+    if watchlist_path.exists():
+        watchlist = load_watchlist(watchlist_path, year, month)
+        print(f"         Watchlist: {len(watchlist)} tickers carregados")
+    else:
+        print("         Watchlist: não encontrada (ticker_suggestion será null)")
+
     # ── LLM Stage 1: Recommendations ────────────────────────────────────────
     _step(5, "Generating recommendations (LLM gpt-4o)")
-    recommendations = generate_recommendations(analysis, risk_profile, macro)
+    recommendations = generate_recommendations(analysis, risk_profile, macro, watchlist)
     print(f"         {len(recommendations.recommendations)} recommendation(s) generated")
 
     # ── LLM Stage 2: Letter ─────────────────────────────────────────────────
