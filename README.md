@@ -6,12 +6,57 @@ POC of an AI-powered pipeline that generates personalized monthly investment rep
 
 ## How it works
 
-```
-portfolio.txt ────┐
-risk_profile.txt ─┼── LLM parsing ──► analysis ──► LLM recommendations ──► LLM letter ──► PDFs
-macro.txt ────────┘         │
-                       market data
-                    (yfinance + CVM)
+```mermaid
+flowchart TD
+    subgraph inputs["Input files (inputs/&lt;client&gt;/)"]
+        P[portfolio.txt]
+        R[risk_profile.txt]
+        M[macro.txt]
+    end
+
+    subgraph stage1["Stage 1 — Ingestion (gpt-4o)"]
+        P --> PP[Portfolio parser]
+        R --> RP[Risk profile parser]
+        M --> MP[Macro analysis parser]
+    end
+
+    subgraph stage2["Stage 2 & 3 — Market data"]
+        PP --> YF[Yahoo Finance\nstock monthly returns]
+        PP --> CVM[CVM API\nfund daily NAVs]
+        CVM --> BM[CDI · IPCA · Ibovespa\nbenchmarks]
+    end
+
+    subgraph stage4["Stage 4 — Portfolio analysis (deterministic)"]
+        YF --> CALC[Calculator]
+        CVM --> CALC
+        BM --> CALC
+        PP --> CALC
+        RP --> CALC
+        CALC --> FLAGS[Flags\ndrawdown · CDI miss · allocation gap]
+        CALC --> LIQ[Liquidity buffer\nequity % → reserve %]
+        CALC --> ALLOC[Allocation gaps\nvs. target]
+    end
+
+    subgraph stage5["Stage 5 — Recommendations (gpt-4o)"]
+        FLAGS --> REC[Chain-of-thought\nrecommendations]
+        LIQ --> REC
+        ALLOC --> REC
+        MP --> REC
+        RP --> REC
+    end
+
+    subgraph stage6["Stage 6 — Letter (gpt-4o)"]
+        REC --> LETTER[Client letter\nBrazilian Portuguese\nfirst-person advisor voice]
+    end
+
+    subgraph stage7["Stage 7 — PDF generation (Playwright)"]
+        LETTER --> CLIENT[report_&lt;client&gt;_&lt;month&gt;.pdf\nLetter · SVG charts · sign-off]
+        REC --> ADVISOR[advisor_&lt;client&gt;_&lt;month&gt;.pdf\nInternal one-pager]
+    end
+
+    subgraph obs["Observability"]
+        stage1 & stage5 & stage6 --> LOG[logs/run_YYYYMMDD.ndjson\ntokens · latency · CoT]
+    end
 ```
 
 **7-stage pipeline:**
