@@ -18,7 +18,7 @@ from src.prompts import macro_analysis as macro_prompts
 from src.prompts import portfolio as portfolio_prompts
 from src.prompts import risk_profile as risk_prompts
 
-DATA_DIR = Path(__file__).parent.parent.parent
+_INPUTS = Path(__file__).parent.parent.parent / "inputs" / "albert"
 
 
 def _mock_parsed_response(parsed_object):
@@ -90,32 +90,35 @@ SAMPLE_MACRO = MacroAnalysis(
 
 class TestParsePortfolio:
     @patch("src.ingestion.parser.client")
-    def test_returns_portfolio_object(self, mock_client):
+    @patch("src.ingestion.parser.read_input", return_value="portfolio text")
+    def test_returns_portfolio_object(self, _mock_read, mock_client):
         mock_client.beta.chat.completions.parse.return_value = _mock_parsed_response(SAMPLE_PORTFOLIO)
-        result = parse_portfolio(DATA_DIR / "XP - Albert's portfolio.txt")
+        result = parse_portfolio(_INPUTS / "portfolio.txt")
         assert isinstance(result, Portfolio)
         assert result.client_name == "Albert da Silva"
 
     @patch("src.ingestion.parser.client")
-    def test_uses_gpt4o_model(self, mock_client):
+    @patch("src.ingestion.parser.read_input", return_value="portfolio text")
+    def test_uses_gpt4o_model(self, _mock_read, mock_client):
         mock_client.beta.chat.completions.parse.return_value = _mock_parsed_response(SAMPLE_PORTFOLIO)
-        parse_portfolio(DATA_DIR / "XP - Albert's portfolio.txt")
+        parse_portfolio(_INPUTS / "portfolio.txt")
         call_kwargs = mock_client.beta.chat.completions.parse.call_args
         assert call_kwargs.kwargs["model"] == "gpt-4o-mini"
 
     @patch("src.ingestion.parser.client")
-    def test_uses_portfolio_system_prompt(self, mock_client):
+    @patch("src.ingestion.parser.read_input", return_value="portfolio text")
+    def test_uses_portfolio_system_prompt(self, _mock_read, mock_client):
         mock_client.beta.chat.completions.parse.return_value = _mock_parsed_response(SAMPLE_PORTFOLIO)
-        parse_portfolio(DATA_DIR / "XP - Albert's portfolio.txt")
+        parse_portfolio(_INPUTS / "portfolio.txt")
         messages = mock_client.beta.chat.completions.parse.call_args.kwargs["messages"]
         system_message = next(m for m in messages if m["role"] == "system")
         assert system_message["content"] == portfolio_prompts.SYSTEM
 
     @patch("src.ingestion.parser.client")
-    def test_passes_file_content_as_user_message(self, mock_client):
+    @patch("src.ingestion.parser.read_input", return_value="Albert da Silva conteudo")
+    def test_passes_file_content_as_user_message(self, _mock_read, mock_client):
         mock_client.beta.chat.completions.parse.return_value = _mock_parsed_response(SAMPLE_PORTFOLIO)
-        txt_path = DATA_DIR / "XP - Albert's portfolio.txt"
-        parse_portfolio(txt_path)
+        parse_portfolio(_INPUTS / "portfolio.txt")
         messages = mock_client.beta.chat.completions.parse.call_args.kwargs["messages"]
         user_message = next(m for m in messages if m["role"] == "user")
         assert "Albert da Silva" in user_message["content"]
@@ -123,16 +126,18 @@ class TestParsePortfolio:
 
 class TestParseRiskProfile:
     @patch("src.ingestion.parser.client")
-    def test_returns_risk_profile_object(self, mock_client):
+    @patch("src.ingestion.parser.read_input", return_value="risk profile text")
+    def test_returns_risk_profile_object(self, _mock_read, mock_client):
         mock_client.beta.chat.completions.parse.return_value = _mock_parsed_response(SAMPLE_RISK_PROFILE)
-        result = parse_risk_profile(DATA_DIR / "XP - Albert's risk profile.txt")
+        result = parse_risk_profile(_INPUTS / "risk_profile.txt")
         assert isinstance(result, RiskProfile)
         assert result.classification == "Moderado"
 
     @patch("src.ingestion.parser.client")
-    def test_uses_risk_profile_system_prompt(self, mock_client):
+    @patch("src.ingestion.parser.read_input", return_value="risk profile text")
+    def test_uses_risk_profile_system_prompt(self, _mock_read, mock_client):
         mock_client.beta.chat.completions.parse.return_value = _mock_parsed_response(SAMPLE_RISK_PROFILE)
-        parse_risk_profile(DATA_DIR / "XP - Albert's risk profile.txt")
+        parse_risk_profile(_INPUTS / "risk_profile.txt")
         messages = mock_client.beta.chat.completions.parse.call_args.kwargs["messages"]
         system_message = next(m for m in messages if m["role"] == "system")
         assert system_message["content"] == risk_prompts.SYSTEM
@@ -140,16 +145,18 @@ class TestParseRiskProfile:
 
 class TestParseMacroAnalysis:
     @patch("src.ingestion.parser.client")
-    def test_returns_macro_analysis_object(self, mock_client):
+    @patch("src.ingestion.parser.read_input", return_value="macro text")
+    def test_returns_macro_analysis_object(self, _mock_read, mock_client):
         mock_client.beta.chat.completions.parse.return_value = _mock_parsed_response(SAMPLE_MACRO)
-        result = parse_macro_analysis(DATA_DIR / "XP - Macro analysis.txt")
+        result = parse_macro_analysis(_INPUTS / "macro.txt")
         assert isinstance(result, MacroAnalysis)
         assert result.projections.selic_terminal == 15.5
 
     @patch("src.ingestion.parser.client")
-    def test_uses_macro_system_prompt(self, mock_client):
+    @patch("src.ingestion.parser.read_input", return_value="macro text")
+    def test_uses_macro_system_prompt(self, _mock_read, mock_client):
         mock_client.beta.chat.completions.parse.return_value = _mock_parsed_response(SAMPLE_MACRO)
-        parse_macro_analysis(DATA_DIR / "XP - Macro analysis.txt")
+        parse_macro_analysis(_INPUTS / "macro.txt")
         messages = mock_client.beta.chat.completions.parse.call_args.kwargs["messages"]
         system_message = next(m for m in messages if m["role"] == "system")
         assert system_message["content"] == macro_prompts.SYSTEM
@@ -160,13 +167,13 @@ class TestParseMacroAnalysis:
 @pytest.mark.integration
 class TestIntegration:
     def test_parse_portfolio_real(self):
-        p = parse_portfolio(DATA_DIR / "XP - Albert's portfolio.txt")
+        p = parse_portfolio(_INPUTS / "portfolio.txt")
         assert {s.ticker for s in p.stocks} == {"LREN3", "MRFG3", "ARZZ3", "HAPV3"}
         assert len(p.funds) == 7
-        assert p.total_invested == pytest.approx(386858.82, rel=0.01)
+        assert p.total_patrimony == pytest.approx(386858.82, rel=0.01)
 
     def test_parse_risk_profile_real(self):
-        rp = parse_risk_profile(DATA_DIR / "XP - Albert's risk profile.txt")
+        rp = parse_risk_profile(_INPUTS / "risk_profile.txt")
         assert rp.classification == "Moderado"
         total = sum([
             rp.target_allocation.acoes_pct,
@@ -177,7 +184,7 @@ class TestIntegration:
         assert total == pytest.approx(1.0, abs=0.01)
 
     def test_parse_macro_real(self):
-        m = parse_macro_analysis(DATA_DIR / "XP - Macro analysis.txt")
+        m = parse_macro_analysis(_INPUTS / "macro.txt")
         assert m.projections.ipca_2025 == pytest.approx(6.1, rel=0.05)
         assert m.projections.selic_terminal == pytest.approx(15.5, rel=0.05)
         assert len(m.key_points) >= 5

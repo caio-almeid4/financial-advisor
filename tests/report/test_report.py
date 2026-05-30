@@ -10,7 +10,7 @@ from src.llm.models import AssetRecommendation, PortfolioRecommendations
 from src.report.charts import allocation_chart, returns_chart
 from src.report.generator import (
     _slugify, _split_paragraphs,
-    generate_report, generate_advisor_report, generate_web_report,
+    generate_report, generate_advisor_report,
 )
 
 
@@ -84,25 +84,26 @@ Seu Assessor XP"""
 # --- charts.py ---
 
 class TestAllocationChart:
-    def test_returns_valid_base64_png(self):
-        b64 = allocation_chart(make_analysis())
-        decoded = base64.b64decode(b64)
-        assert decoded[:8] == b"\x89PNG\r\n\x1a\n"
+    def test_returns_svg_string(self):
+        svg = allocation_chart(make_analysis())
+        assert svg.startswith("<svg")
+        assert "</svg>" in svg
 
     def test_all_asset_classes_present(self):
-        b64 = allocation_chart(make_analysis())
-        assert len(b64) > 100
+        svg = allocation_chart(make_analysis())
+        assert "Ações" in svg
+        assert "Renda Fixa" in svg
 
 
 class TestReturnsChart:
-    def test_returns_valid_base64_png(self):
-        b64 = returns_chart(make_analysis())
-        decoded = base64.b64decode(b64)
-        assert decoded[:8] == b"\x89PNG\r\n\x1a\n"
+    def test_returns_svg_string(self):
+        svg = returns_chart(make_analysis())
+        assert svg.startswith("<svg")
+        assert "</svg>" in svg
 
-    def test_handles_none_monthly_return(self):
-        b64 = returns_chart(make_analysis())
-        assert len(b64) > 100
+    def test_contains_cdi_reference(self):
+        svg = returns_chart(make_analysis())
+        assert "CDI" in svg
 
 
 # --- generator helpers ---
@@ -150,13 +151,3 @@ def test_generate_advisor_report_creates_pdf(tmp_path):
     assert "albert_da_silva" in pdf_path.name
 
 
-@pytest.mark.integration
-def test_generate_web_report_creates_html(tmp_path):
-    html_path = generate_web_report(LETTER, make_analysis(), make_recommendations(), output_dir=tmp_path)
-    assert html_path.exists()
-    assert html_path.suffix == ".html"
-    content = html_path.read_text(encoding="utf-8")
-    assert "chart.js" in content.lower()
-    assert "Albert da Silva" in content
-    assert "chartAllocation" in content
-    assert "chartTimeline" in content

@@ -117,17 +117,18 @@ uv run python main.py --input-dir inputs/albert --output-dir /tmp/reports
 
 ## Input format
 
-Each client folder under `inputs/` must contain three plain-text files exported from XP's systems:
+Each client folder under `inputs/` must contain three files exported from XP's systems.
+Both `.pdf` and `.txt` are accepted per file — PDF takes priority if both exist, and mixing is allowed (e.g. `portfolio.pdf` + `macro.txt`).
 
 ```
 inputs/
   albert/
-    portfolio.txt      # client portfolio with positions and balances
-    risk_profile.txt   # suitability profile with target allocation
-    macro.txt          # XP monthly macroeconomic research report
+    portfolio.pdf      # or portfolio.txt
+    risk_profile.pdf   # or risk_profile.txt
+    macro.pdf          # or macro.txt
 ```
 
-The LLM parser handles free-form formatting — no rigid schema required.
+The LLM parser handles free-form formatting — no rigid schema required. PDF files are processed with `pdfplumber`, which reconstructs table rows as pipe-delimited text before passing to the LLM.
 
 ---
 
