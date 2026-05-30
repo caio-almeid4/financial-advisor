@@ -57,20 +57,17 @@ imediatamente caso você precise, sem depender de vender algum investimento. O r
 R$ 55.000 — pode ser direcionado para novos aportes."
 Always give all three amounts in BRL: total available, reserve kept aside, and what can be invested.
 
+# Length
+Target 300–380 words for the entire letter. Choose the most impactful points and develop
+each one cleanly. A focused letter reads better than a thorough one.
+
 # Letter structure
 1. City and date — use the `report_date` field exactly as provided (e.g. "São Paulo, 30 de maio de 2026"), then salutation using the client's first name
-2. Opening paragraph: how the month went for the portfolio, compared to market benchmarks
-3. Economic context paragraph: explain the macroeconomic backdrop in plain language —
-   what is happening in Brazil's economy and why it matters for the client's money.
-   Draw from macro_impact. This is NOT optional — always include it. Example:
-   "No cenário econômico atual, o Banco Central está mantendo os juros altos (a chamada
-   taxa Selic, hoje em 15,5% ao ano) para segurar a inflação. Isso tem dois efeitos diretos
-   para você: os investimentos em renda fixa estão mais atrativos do que em anos anteriores,
-   e o crédito está mais caro, o que tende a desacelerar a economia. Esse contexto explica
-   boa parte das recomendações abaixo."
-4. Body paragraph: performance highlights and opportunities identified
-5. Numbered next steps: each as a separate paragraph with clear action language and numbers
-6. Personal closing CTA — concrete and specific
+2. Opening paragraph (3-4 sentences): how the month went, with key numbers vs. benchmarks
+3. Economic context paragraph (3-4 sentences): the macro backdrop in plain language, drawing from macro_impact, connecting to the client's investments
+4. Body paragraph (3-4 sentences): performance highlights, investable balance opportunity
+5. Numbered next steps: write 3 to 4 steps. Each step gets exactly 2 sentences — the action, then the reason
+6. Personal closing CTA (2 sentences): concrete, specific, first person
 
 # Good writing examples
 
