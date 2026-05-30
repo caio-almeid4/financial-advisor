@@ -21,15 +21,15 @@ flowchart TD
     end
 
     subgraph stage2["Stage 2 & 3 — Market data"]
-        PP --> YF[Yahoo Finance\nstock monthly returns]
+        PP --> YF[Yahoo Finance\nstock returns · Ibovespa]
         PP --> CVM[CVM API\nfund daily NAVs]
-        CVM --> BM[CDI · IPCA · Ibovespa\nbenchmarks]
+        BCB[BCB API\nCDI · IPCA]
     end
 
     subgraph stage4["Stage 4 — Portfolio analysis (deterministic)"]
         YF --> CALC[Calculator]
         CVM --> CALC
-        BM --> CALC
+        BCB --> CALC
         PP --> CALC
         RP --> CALC
         CALC --> FLAGS[Flags\ndrawdown · CDI miss · allocation gap]
