@@ -127,6 +127,10 @@
   }
   .no-flags { font-size: 8.5pt; color: var(--muted); font-style: italic; }
 
+  /* ── Page break control ── */
+  .section-title { page-break-after: avoid; }
+  .rec-table, .balance-table, .assessment, .flags-list { page-break-inside: avoid; }
+
   /* ── Recommendations table ── */
   .rec-table { width: 100%; border-collapse: collapse; }
   .rec-table th {

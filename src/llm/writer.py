@@ -44,7 +44,10 @@ def _build_user_message(
         "ibovespa_monthly_pct": analysis.ibovespa_monthly_pct,
         "ipca_monthly_pct": analysis.ipca_monthly_pct,
         "observations": recommendations.observations,
-        "recommendations": [r.model_dump() for r in recommendations.recommendations],
+        "recommendations": [
+            {k: v for k, v in r.model_dump().items() if k != "ticker_suggestion"}
+            for r in recommendations.recommendations
+        ],
         "macro_impact": recommendations.macro_impact,
         "overall_assessment": recommendations.overall_assessment,
     }, ensure_ascii=False, indent=2)
@@ -61,14 +64,14 @@ def write_letter(
 
     t0 = time.perf_counter()
     completion = client.chat.completions.create(
-        model="gpt-5.4",
+        model="gpt-4.1",
         messages=messages,
     )
     latency = time.perf_counter() - t0
 
     log_llm_call(
         stage="writer",
-        model="gpt-5.4",
+        model="gpt-4.1",
         messages=messages,
         response=completion,
         latency_s=latency,

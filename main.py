@@ -82,7 +82,7 @@ _PIPELINE_STAGES = (
     "Fetching fund NAVs (CVM) and benchmarks",
     "Analysing portfolio (deterministic)",
     "Generating recommendations (LLM gpt-5.4)",
-    "Writing client letter (LLM gpt-5.4)",
+    "Writing client letter (LLM gpt-4.1)",
     "Generating PDF reports (Playwright)",
 )
 
@@ -194,7 +194,7 @@ def main() -> None:
     print(f"         {len(recommendations.recommendations)} recommendation(s) generated")
 
     # ── LLM Stage 2: Letter ─────────────────────────────────────────────────
-    _step(6, "Writing client letter (LLM gpt-5.4)")
+    _step(6, "Writing client letter (LLM gpt-4.1)")
     letter = write_letter(recommendations, analysis)
 
     # ── PDF reports ──────────────────────────────────────────────────────────
