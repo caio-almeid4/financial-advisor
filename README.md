@@ -140,15 +140,23 @@ The LLM parser handles free-form formatting — no rigid schema required. PDF fi
 
 ### watchlist.csv format
 
+Two formats are accepted (auto-detected by header):
+
+**Format A — XP portfolio export** (recommended):
 ```csv
-ticker,thesis
-ITUB4,Banco sólido com histórico consistente de dividendos
-EGIE3,Elétrica defensiva com dividend yield elevado e receita previsível
-PETR4,Exposição a commodities e hedge cambial natural
+Asset class,Asset,Current price,Last month price
+Stocks,ITUB4,27.8,26.9
+Stocks,PETR4,37.12,34.8
 ```
 
-- **`ticker`** (required): B3 ticker without the `.SA` suffix
-- **`thesis`** (optional): short rationale the advisor has for monitoring this asset
+**Format B — simple list**:
+```csv
+ticker,thesis
+ITUB4,Banco sólido com dividendos consistentes
+PETR4,Exposição a commodities e hedge cambial
+```
+
+CSV prices are ignored — monthly returns are always fetched from Yahoo Finance at report generation time, keeping watchlist data consistent with the rest of the portfolio analysis.
 
 When present, the recommendations LLM picks tickers from this list to populate the `ticker_suggestion` field — shown as a yellow badge in the **advisor PDF only**. The client PDF always uses investment categories, never specific tickers (CVM compliance).
 

@@ -1,13 +1,13 @@
-ticker,thesis
-ITUB4,Banco sólido com histórico consistente de dividendos — renda fixa via proventos
-BBDC4,Bancário com desconto histórico — adequado para perfil moderado
-WEGE3,Industrial de alta qualidade com crescimento secular e margens sólidas
-EGIE3,Elétrica defensiva com dividend yield elevado e receita previsível
-PETR4,Exposição a commodities e hedge cambial natural
-VALE3,Commodities — hedge FX e ciclo de minério de ferro
-BBSE3,Seguros — receita recorrente e dividendos consistentes
-RADL3,Farmácias — crescimento defensivo com expansão de rede
-RENT3,Locação de veículos — crescimento secular e ativo leve
-CPLE6,Elétrica paranaense — defensivo com dividendos regulares
-PRIO3,Oil & Gas puro — alta exposição a variação cambial
-GGBR4,Siderúrgico cíclico — para momentos de aceleração econômica
+Asset class,Asset,Current price,Last month price
+Stocks,LREN3,16.94,15.55
+Stocks,GGBR4,23.45,22.9
+Stocks,ARZZ3,56.58,56.55
+Stocks,ABEV3,14.32,13.5
+Stocks,PETR4,37.12,34.8
+Stocks,VALE3,63.45,61.1
+Stocks,ITUB4,27.8,26.9
+Stocks,MRFG3,10.26,12.27
+Stocks,WEGE3,42.6,41.2
+Stocks,B3SA3,12.05,11.75
+Stocks,BBAS3,28.3,26.9
+Stocks,HAPV3,3.97,2.25
