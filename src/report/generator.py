@@ -2,6 +2,7 @@ import base64
 import json
 import re
 import unicodedata
+from datetime import datetime
 from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
@@ -127,6 +128,19 @@ def _html_to_pdf(html: str, output_path: Path) -> None:
         browser.close()
 
 
+_MONTH_PT = {
+    1: "janeiro", 2: "fevereiro", 3: "março", 4: "abril",
+    5: "maio", 6: "junho", 7: "julho", 8: "agosto",
+    9: "setembro", 10: "outubro", 11: "novembro", 12: "dezembro",
+}
+
+
+def _report_date_header() -> str:
+    """Return current month and year for the PDF header, e.g. 'MAIO DE 2026'."""
+    now = datetime.now()
+    return f"{_MONTH_PT[now.month].upper()} DE {now.year}"
+
+
 def _make_env() -> Environment:
     return Environment(loader=FileSystemLoader(str(_TEMPLATE_DIR)), autoescape=True)
 
@@ -151,6 +165,7 @@ def generate_report(
     template = _make_env().get_template("template.html")
     html_content = template.render(
         logo_b64=_logo_base64(),
+        report_date_header=_report_date_header(),
         reference_month=analysis.reference_month,
         client_name=analysis.client_name,
         advisor_name=analysis.advisor_name,
