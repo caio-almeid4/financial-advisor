@@ -15,7 +15,7 @@ from .models import MacroAnalysis, Portfolio, RiskProfile
 from .reader import read_input
 
 client = OpenAI()
-_MODEL = "gpt-4o-mini"
+_MODEL = "gpt-5.4-mini"
 
 
 def _parse(model_class, system_prompt: str, text: str, stage: str):

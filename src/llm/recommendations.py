@@ -50,7 +50,7 @@ def generate_recommendations(
 
     t0 = time.perf_counter()
     completion = client.beta.chat.completions.parse(
-        model="gpt-4o",
+        model="gpt-5.4",
         messages=messages,
         response_format=PortfolioRecommendations,
     )
@@ -59,7 +59,7 @@ def generate_recommendations(
     result = completion.choices[0].message.parsed
     log_llm_call(
         stage="recommendations",
-        model="gpt-4o",
+        model="gpt-5.4",
         messages=messages,
         response=completion,
         latency_s=latency,

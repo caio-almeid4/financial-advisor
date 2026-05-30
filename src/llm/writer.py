@@ -61,14 +61,14 @@ def write_letter(
 
     t0 = time.perf_counter()
     completion = client.chat.completions.create(
-        model="gpt-4o",
+        model="gpt-5.4",
         messages=messages,
     )
     latency = time.perf_counter() - t0
 
     log_llm_call(
         stage="writer",
-        model="gpt-4o",
+        model="gpt-5.4",
         messages=messages,
         response=completion,
         latency_s=latency,

@@ -81,8 +81,8 @@ _PIPELINE_STAGES = (
     "Fetching stock prices (Yahoo Finance)",
     "Fetching fund NAVs (CVM) and benchmarks",
     "Analysing portfolio (deterministic)",
-    "Generating recommendations (LLM gpt-4o)",
-    "Writing client letter (LLM gpt-4o)",
+    "Generating recommendations (LLM gpt-5.4)",
+    "Writing client letter (LLM gpt-5.4)",
     "Generating PDF reports (Playwright)",
 )
 
@@ -189,12 +189,12 @@ def main() -> None:
         print("         Watchlist: não encontrada (ticker_suggestion será null)")
 
     # ── LLM Stage 1: Recommendations ────────────────────────────────────────
-    _step(5, "Generating recommendations (LLM gpt-4o)")
+    _step(5, "Generating recommendations (LLM gpt-5.4)")
     recommendations = generate_recommendations(analysis, risk_profile, macro, watchlist)
     print(f"         {len(recommendations.recommendations)} recommendation(s) generated")
 
     # ── LLM Stage 2: Letter ─────────────────────────────────────────────────
-    _step(6, "Writing client letter (LLM gpt-4o)")
+    _step(6, "Writing client letter (LLM gpt-5.4)")
     letter = write_letter(recommendations, analysis)
 
     # ── PDF reports ──────────────────────────────────────────────────────────
