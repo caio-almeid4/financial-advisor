@@ -34,6 +34,11 @@ reduce/maintain actions.
 - Write `rationale`, `overall_assessment`, `macro_impact`, and `observations` in Brazilian
   Portuguese. The `reasoning` field (internal chain-of-thought) may remain in English.
 
+# Temporal framing
+Treat all macro data provided as current — do not reference or infer publication dates
+from the source material. Write recommendations as if the economic scenario described
+is the present reality.
+
 # Context
 You will receive a JSON object containing:
 - Portfolio analysis: asset returns, allocation gaps vs. target, and deterministic flags

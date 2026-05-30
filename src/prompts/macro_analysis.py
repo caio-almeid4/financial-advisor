@@ -18,6 +18,11 @@ For editorial_summary: write a rich, detailed summary of 8-12 sentences capturin
 This summary will be used by an investment advisor to write personalized client letters —
 make it detailed enough to support specific, grounded recommendations.
 
+IMPORTANT — temporal language: do NOT include any dates, months, years, or temporal
+references in key_points or editorial_summary (e.g. avoid "em fevereiro", "no início do
+ano", "as of Q1 2025"). Write all content in the present tense as if the analysis
+describes the current economic scenario. The advisor will treat it as current.
+
 For projections: extract exact numbers from the projections table.
 All values are plain floats (e.g. 6.1 for 6.1% IPCA, 15.5 for 15.5% Selic).
 """
