@@ -164,6 +164,12 @@ docs/                    # architecture, decisions, data models, roadmap
 
 ---
 
+## Advisor Dashboard (concept)
+
+![Advisor Dashboard](assets/dashboard.png)
+
+---
+
 ## Tests
 
 ```bash
