@@ -28,6 +28,7 @@ def _parse(model_class, system_prompt: str, text: str, stage: str):
         model=_MODEL,
         messages=messages,
         response_format=model_class,
+        temperature=0,
     )
     latency = time.perf_counter() - t0
 
