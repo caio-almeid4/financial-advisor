@@ -60,6 +60,8 @@ def _split_paragraphs(letter: str) -> list[str]:
     paras = [re.sub(r"\s*\[.*?\]", "", p).strip() for p in paras]
     # Drop any paragraph that became empty after stripping
     paras = [p for p in paras if p]
+    # Hard cap: drop trailing paragraphs beyond the max to reduce fit iterations
+    paras = paras[:_MAX_PARAGRAPHS]
     return [_md_to_html(p) for p in paras]
 
 
@@ -80,18 +82,28 @@ def _format_pct(value: float | None) -> tuple[str, str]:
 
 
 _A4_WIDTH_PX  = 794   # 210mm at 96dpi
-_PAGE1_MAX_PX = 1040  # A4 height (1122px) minus 20mm bottom margin (76px), with 6px safety buffer
+_PAGE1_MAX_PX = 1020  # A4 height (1122px) minus 20mm bottom margin (76px), with 26px safety buffer
 
-_LETTER_FONT_SIZES = ["9.5pt", "9pt", "8.5pt", "8pt", "7.5pt"]
+# Each step: (font-size, line-height)
+_LETTER_SIZE_STEPS = [
+    ("9.5pt", "1.65"),
+    ("9pt",   "1.60"),
+    ("8.5pt", "1.55"),
+    ("8pt",   "1.50"),
+    ("7.5pt", "1.45"),
+    ("7pt",   "1.40"),
+    ("6.5pt", "1.35"),
+]
+_MAX_PARAGRAPHS = 9  # hard cap: trim letter before even trying to fit
 
 
 def _fit_letter_to_page(page) -> None:
-    """Shrink .letter font size until the section-divider sits within page 1.
+    """Ensure the section-divider sits within page 1 so charts stay on page 2.
 
-    Uses the natural document flow position of .section-divider as a proxy:
-    if its top offset exceeds the first-page height, the letter is spilling
-    onto page 2, which would push the charts to page 3.
-    No-op for templates that don't have .letter or .section-divider (e.g. advisor PDF).
+    Layer 1: progressively shrink font-size AND line-height together.
+    Layer 2: if still overflowing at the smallest size, drop trailing paragraphs
+             one at a time until it fits (hard cap on content, not on readability).
+    No-op for templates without .letter or .section-divider (e.g. advisor PDF).
     """
     has_elements = page.evaluate(
         "() => !!(document.querySelector('.letter') && document.querySelector('.section-divider'))"
@@ -99,15 +111,32 @@ def _fit_letter_to_page(page) -> None:
     if not has_elements:
         return
 
-    for size in _LETTER_FONT_SIZES:
-        page.evaluate(
-            f"document.querySelector('.letter').style.fontSize = '{size}'"
-        )
-        top = page.evaluate(
+    def _divider_top() -> float:
+        return page.evaluate(
             "document.querySelector('.section-divider').getBoundingClientRect().top"
+            " + window.scrollY"
         )
-        if top <= _PAGE1_MAX_PX:
+
+    # Layer 1: shrink font + line-height
+    for font_size, line_height in _LETTER_SIZE_STEPS:
+        page.evaluate(f"""
+            const l = document.querySelector('.letter');
+            l.style.fontSize   = '{font_size}';
+            l.style.lineHeight = '{line_height}';
+        """)
+        if _divider_top() <= _PAGE1_MAX_PX:
             return
+
+    # Layer 2: drop trailing paragraphs until it fits
+    while _divider_top() > _PAGE1_MAX_PX:
+        removed = page.evaluate("""
+            const paras = document.querySelectorAll('.letter p');
+            if (paras.length <= 1) return false;
+            paras[paras.length - 1].remove();
+            return true;
+        """)
+        if not removed:
+            break  # single paragraph left — can't trim further, accept overflow
 
 
 def _html_to_pdf(html: str, output_path: Path) -> None:
