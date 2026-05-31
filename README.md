@@ -1,6 +1,6 @@
 # XP AI Financial Advisor
 
-POC of an AI-powered pipeline that generates personalized monthly investment reports for XP Investimentos clients. Given three plain-text input files, it produces two PDFs in under 60 seconds: a client-facing letter with charts and an internal advisor summary.
+POC of an AI-powered pipeline that generates personalized monthly investment reports for XP Investimentos clients. Given three input files, it produces two PDFs in under 60 seconds: a client-facing letter with charts and an internal advisor summary.
 
 ---
 
@@ -65,8 +65,6 @@ flowchart TD
     end
 ```
 
-**7-stage pipeline:**
-
 | # | Stage | Model | Description |
 |---|-------|-------|-------------|
 | 1 | Ingestion | gpt-5.4-mini | Parses portfolio, risk profile, and macro files (.pdf or .txt via pdfplumber) |
@@ -78,7 +76,7 @@ flowchart TD
 | 7 | PDF generation | — | Playwright (Chromium) renders two PDFs with inline SVG charts |
 
 **Outputs:**
-- `output/report_<client>_<month>.pdf` — client-facing report with letter and charts
+- `output/report_<client>_<month>.pdf` — client-facing report (letter + charts, 2 pages)
 - `output/advisor_<client>_<month>.pdf` — internal one-page advisor briefing
 
 ---
@@ -109,7 +107,7 @@ echo "OPENAI_API_KEY=sk-..." > .env
 ## Usage
 
 ```bash
-# Run with the default sample client (inputs/albert/)
+# Run with the sample client (inputs/albert/)
 uv run python main.py
 
 # Run with a different client
@@ -125,7 +123,7 @@ uv run python main.py --input-dir inputs/albert --output-dir /tmp/reports
 
 Each client folder under `inputs/` must contain three files exported from XP's systems, plus an optional watchlist.
 
-Both `.pdf` and `.txt` are accepted per file — PDF takes priority if both exist, and mixing is allowed (e.g. `portfolio.pdf` + `macro.txt`).
+Both `.pdf` and `.txt` are accepted — PDF takes priority if both exist, and mixing is allowed (e.g. `portfolio.pdf` + `macro.txt`).
 
 ```
 inputs/
@@ -133,14 +131,10 @@ inputs/
     portfolio.pdf        # or portfolio.txt
     risk_profile.pdf     # or risk_profile.txt
     macro.pdf            # or macro.txt
-    watchlist.csv        # optional — advisor-curated ticker list for internal suggestions
+    watchlist.csv        # optional — advisor-curated ticker list
 ```
 
-The LLM parser handles free-form formatting — no rigid schema required. PDF files are processed with `pdfplumber`, which reconstructs table rows as pipe-delimited text before passing to the LLM.
-
 ### watchlist.csv format
-
-Follows the XP portfolio export format:
 
 ```csv
 Asset class,Asset,Current price,Last month price
@@ -148,40 +142,25 @@ Stocks,ITUB4,27.8,26.9
 Stocks,PETR4,37.12,34.8
 ```
 
-CSV prices are ignored — monthly returns are always fetched from Yahoo Finance at report generation time, keeping watchlist data consistent with the rest of the portfolio analysis.
-
-When present, the recommendations LLM picks tickers from this list to populate the `ticker_suggestion` field — shown as a yellow badge in the **advisor PDF only**. The client PDF always uses investment categories, never specific tickers (CVM compliance).
-
----
-
-## Design note — ticker recommendations
-
-Specific tickers appear **only in the advisor PDF**, never in the client letter.
-
-The reason is risk management, not regulation: the AI may lack context about the client's full tax situation, assets held outside XP, or liquidity constraints. The advisor reviews the `ticker_suggestion` field privately and makes the final call before the client meeting. The watchlist ensures suggestions come from a pre-vetted set of assets the advisor already monitors, not arbitrary LLM output.
+CSV prices are ignored at runtime — monthly returns are always re-fetched from Yahoo Finance for consistency with the rest of the pipeline. When present, the recommendations LLM picks tickers from this list to populate `ticker_suggestion`, shown as a badge in the **advisor PDF only**.
 
 ---
 
 ## Project structure
 
 ```
-main.py              # pipeline orchestration + CLI
+main.py                  # pipeline orchestration + CLI
 src/
-  ingestion/         # LLM-based parsers for the three input files
-  analysis/          # deterministic calculator, flags, liquidity buffer
-  llm/               # recommendations and letter writing (gpt-4o)
-  prompts/           # system prompts for each LLM stage
-  report/            # Playwright PDF generator, SVG charts, HTML templates
-  observability/     # structured NDJSON logging per run
-inputs/              # one folder per client
-assets/              # static assets (logo)
+  ingestion/             # LLM-based parsers + PDF/TXT reader
+  analysis/              # deterministic calculator, flags, liquidity buffer
+  llm/                   # recommendations and letter writing
+  prompts/               # system prompts for each LLM stage
+  report/                # Playwright PDF generator, SVG charts, HTML templates
+  observability/         # structured NDJSON logging per run
+inputs/                  # one folder per client
+assets/                  # static assets (logo)
+docs/                    # architecture, decisions, data models, roadmap
 ```
-
----
-
-## Observability
-
-Every pipeline run writes a structured log to `logs/run_YYYYMMDD_HHMMSS.ndjson`. Each line is a JSON object capturing stage, model, token counts, latency, and the full chain-of-thought reasoning for LLM calls.
 
 ---
 
@@ -189,4 +168,15 @@ Every pipeline run writes a structured log to `logs/run_YYYYMMDD_HHMMSS.ndjson`.
 
 ```bash
 uv run pytest tests/ -m "not integration" -q
+```
+
+---
+
+## Observability
+
+Every pipeline run writes a structured log to `logs/run_YYYYMMDD_HHMMSS.ndjson`. Each line is a JSON object capturing stage, model, token counts, latency, and the full chain-of-thought for LLM calls.
+
+```bash
+# Quick inspection
+cat logs/run_*.ndjson | jq 'select(.msg=="llm_call") | {stage, latency_s, input_tokens, output_tokens}'
 ```
