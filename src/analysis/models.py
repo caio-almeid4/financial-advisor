@@ -16,7 +16,8 @@ class AllocationStatus(BaseModel):
     asset_class: str
     current_pct: float
     target_pct: float
-    gap_pct: float  # current - target; positive = overweight, negative = underweight
+    gap_pct: float   # current - target; positive = overweight, negative = underweight
+    gap_brl: float   # gap_pct * total_patrimony; pre-computed so the LLM never does this math
 
 
 class PortfolioAnalysis(BaseModel):

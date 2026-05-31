@@ -42,10 +42,10 @@ def make_analysis() -> PortfolioAnalysis:
         ipca_monthly_pct=0.43,
         ibovespa_monthly_pct=-1.5,
         allocation_status=[
-            AllocationStatus(asset_class="acoes", current_pct=0.19, target_pct=0.20, gap_pct=-0.01),
-            AllocationStatus(asset_class="renda_fixa", current_pct=0.50, target_pct=0.45, gap_pct=0.05),
-            AllocationStatus(asset_class="fundos_multimercado", current_pct=0.20, target_pct=0.20, gap_pct=0.0),
-            AllocationStatus(asset_class="fundos_acoes", current_pct=0.11, target_pct=0.15, gap_pct=-0.04),
+            AllocationStatus(asset_class="acoes", current_pct=0.19, target_pct=0.20, gap_pct=-0.01, gap_brl=-3120.0),
+            AllocationStatus(asset_class="renda_fixa", current_pct=0.50, target_pct=0.45, gap_pct=0.05, gap_brl=15600.0),
+            AllocationStatus(asset_class="fundos_multimercado", current_pct=0.20, target_pct=0.20, gap_pct=0.0, gap_brl=0.0),
+            AllocationStatus(asset_class="fundos_acoes", current_pct=0.11, target_pct=0.15, gap_pct=-0.04, gap_brl=-12480.0),
         ],
         flags=["HAPV3 acumula -74.6% desde a compra"],
     )

@@ -132,18 +132,24 @@ def make_risk_profile() -> RiskProfile:
 class TestAllocationStatus:
     def test_returns_one_status_per_class(self):
         current = {"acoes": 0.20, "renda_fixa": 0.10, "fundos_multimercado": 0.50, "fundos_acoes": 0.20}
-        status = _allocation_status(current, make_risk_profile())
+        status = _allocation_status(current, make_risk_profile(), total_patrimony=100_000.0)
         assert len(status) == 4
 
     def test_gap_is_current_minus_target(self):
         current = {"acoes": 0.05, "renda_fixa": 0.30, "fundos_multimercado": 0.35, "fundos_acoes": 0.30}
-        status = _allocation_status(current, make_risk_profile())
+        status = _allocation_status(current, make_risk_profile(), total_patrimony=100_000.0)
         acoes_status = next(s for s in status if s.asset_class == "acoes")
         assert acoes_status.gap_pct == pytest.approx(0.05 - 0.20, abs=0.001)
 
+    def test_gap_brl_is_gap_pct_times_patrimony(self):
+        current = {"acoes": 0.05, "renda_fixa": 0.30, "fundos_multimercado": 0.35, "fundos_acoes": 0.30}
+        status = _allocation_status(current, make_risk_profile(), total_patrimony=100_000.0)
+        acoes_status = next(s for s in status if s.asset_class == "acoes")
+        assert acoes_status.gap_brl == pytest.approx((0.05 - 0.20) * 100_000.0, abs=0.01)
+
     def test_overweight_has_positive_gap(self):
         current = {"acoes": 0.40, "renda_fixa": 0.20, "fundos_multimercado": 0.25, "fundos_acoes": 0.15}
-        status = _allocation_status(current, make_risk_profile())
+        status = _allocation_status(current, make_risk_profile(), total_patrimony=100_000.0)
         acoes_status = next(s for s in status if s.asset_class == "acoes")
         assert acoes_status.gap_pct > 0
 

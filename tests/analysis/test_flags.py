@@ -26,7 +26,7 @@ def make_asset(**overrides) -> AssetReturn:
 
 
 def make_status(**overrides) -> AllocationStatus:
-    defaults = dict(asset_class="acoes", current_pct=0.20, target_pct=0.20, gap_pct=0.0)
+    defaults = dict(asset_class="acoes", current_pct=0.20, target_pct=0.20, gap_pct=0.0, gap_brl=0.0)
     return AllocationStatus(**{**defaults, **overrides})
 
 

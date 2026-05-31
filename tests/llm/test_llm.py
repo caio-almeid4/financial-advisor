@@ -43,7 +43,7 @@ def make_analysis() -> PortfolioAnalysis:
         ibovespa_monthly_pct=-1.5,
         allocation_status=[
             AllocationStatus(asset_class="acoes", current_pct=0.19,
-                             target_pct=0.20, gap_pct=-0.01),
+                             target_pct=0.20, gap_pct=-0.01, gap_brl=-3120.0),
         ],
         flags=["HAPV3 acumula -74.6% desde a compra"],
     )

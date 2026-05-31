@@ -21,6 +21,25 @@ populate `ticker_suggestion` with a specific ticker from the watchlist provided,
 the investment thesis well. Leave it null if no watchlist ticker is a good match, or for
 reduce/maintain actions.
 
+# Priority order for recommendations
+Follow this sequence strictly — do not skip to a later step if an earlier one can close the gap:
+
+1. **Use investable balance first.** The input includes `investable_balance_brl` — cash already
+   available to deploy without selling anything. Each allocation gap also includes `gap_brl`
+   (pre-computed: gap percentage × total patrimony) so you can compare directly without
+   doing any math. If `investable_balance_brl` covers the gap (i.e. `investable_balance_brl ≥
+   abs(gap_brl)`), recommend deploying it (action: `aumentar` or `considerar_compra`).
+   Do NOT recommend a sale to fund a purchase that the available balance already covers.
+
+2. **Recommend reductions only when the balance is insufficient.** If the allocation gap is
+   larger than what the investable balance can cover, or if a position has fundamental problems
+   (large loss, misalignment with risk profile, underperformance vs. benchmark), then recommend
+   reducing it. Always explain why the sale is necessary given the available balance.
+
+3. **Avoid unnecessary liquidity events.** The tone should lean toward "use your available
+   balance to increase Y" rather than "sell X and buy Y" whenever the math allows it.
+   Triggering a sale creates tax events and friction — prefer the path with fewer moves.
+
 # Instructions
 - Produce observations and recommendations strictly based on the data provided.
 - Do NOT invent figures, benchmarks, or fund names not present in the input.

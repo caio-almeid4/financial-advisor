@@ -75,7 +75,7 @@ def _current_allocation(portfolio: Portfolio) -> dict[str, float]:
     return {k: round(v / 100, 4) for k, v in alloc.items()}  # convert % to fraction
 
 
-def _allocation_status(current: dict[str, float], target: RiskProfile) -> list[AllocationStatus]:
+def _allocation_status(current: dict[str, float], target: RiskProfile, total_patrimony: float) -> list[AllocationStatus]:
     target_map = {
         "acoes": target.target_allocation.acoes_pct,
         "renda_fixa": target.target_allocation.renda_fixa_pct,
@@ -88,6 +88,7 @@ def _allocation_status(current: dict[str, float], target: RiskProfile) -> list[A
             current_pct=round(current.get(cls, 0.0), 4),
             target_pct=target_map[cls],
             gap_pct=round(current.get(cls, 0.0) - target_map[cls], 4),
+            gap_brl=round((current.get(cls, 0.0) - target_map[cls]) * total_patrimony, 2),
         )
         for cls in target_map
     ]
@@ -208,7 +209,7 @@ def analyze_portfolio(
 
     # Allocation analysis
     current_alloc = _current_allocation(portfolio)
-    allocation_status = _allocation_status(current_alloc, risk_profile)
+    allocation_status = _allocation_status(current_alloc, risk_profile, portfolio.total_patrimony)
 
     # Liquidity buffer
     buffer_pct = _liquidity_tier(risk_profile.target_allocation)
