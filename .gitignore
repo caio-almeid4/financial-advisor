@@ -21,3 +21,4 @@ profitability_calc_wip.csv
 uv.lock
 .python-version
 docs/
+src/report/poc_report_template.html
