@@ -99,7 +99,8 @@ uv sync
 uv run playwright install chromium
 
 # Configure API key
-echo "OPENAI_API_KEY=sk-..." > .env
+cp .env.example .env
+# then open .env and replace sk-... with your actual key
 ```
 
 ---
