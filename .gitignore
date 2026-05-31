@@ -16,3 +16,7 @@ wheels/
 output/
 logs/
 profitability_calc_wip.csv
+
+# uv / pyenv tooling
+uv.lock
+.python-version

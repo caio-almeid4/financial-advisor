@@ -140,20 +140,12 @@ The LLM parser handles free-form formatting — no rigid schema required. PDF fi
 
 ### watchlist.csv format
 
-Two formats are accepted (auto-detected by header):
+Follows the XP portfolio export format:
 
-**Format A — XP portfolio export** (recommended):
 ```csv
 Asset class,Asset,Current price,Last month price
 Stocks,ITUB4,27.8,26.9
 Stocks,PETR4,37.12,34.8
-```
-
-**Format B — simple list**:
-```csv
-ticker,thesis
-ITUB4,Banco sólido com dividendos consistentes
-PETR4,Exposição a commodities e hedge cambial
 ```
 
 CSV prices are ignored — monthly returns are always fetched from Yahoo Finance at report generation time, keeping watchlist data consistent with the rest of the portfolio analysis.
