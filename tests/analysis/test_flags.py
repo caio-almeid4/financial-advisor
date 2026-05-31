@@ -6,7 +6,7 @@ from src.analysis.flags import (
     generate_flags,
     _flag_allocation_gaps,
     _flag_large_inception_losses,
-    _flag_underperforming_cdi,
+    _flag_underperforming_benchmark,
 )
 from src.analysis.models import AllocationStatus, AssetReturn
 
@@ -18,7 +18,8 @@ def make_asset(**overrides) -> AssetReturn:
         allocation_pct=8.91,
         monthly_return_pct=9.0,
         return_since_inception_pct=-10.0,
-        monthly_vs_cdi=8.0,
+        monthly_vs_benchmark=8.0,
+        benchmark="Ibovespa",
         investment_date="01/01/2024",
     )
     return AssetReturn(**{**defaults, **overrides})
@@ -95,22 +96,31 @@ class TestFlagAllocationGaps:
         assert "30.0%" in flags[0]
 
 
-# --- Underperforming CDI flags ---
+# --- Underperforming benchmark flags ---
 
-class TestFlagUnderperformingCdi:
-    def test_flags_asset_below_cdi(self):
-        asset = make_asset(name="ARZZ3", monthly_return_pct=0.5, monthly_vs_cdi=-0.4)
-        flags = _flag_underperforming_cdi([asset])
+class TestFlagUnderperformingBenchmark:
+    def test_flags_stock_below_ibovespa(self):
+        asset = make_asset(name="ARZZ3", asset_class="acoes", benchmark="Ibovespa",
+                           monthly_return_pct=0.5, monthly_vs_benchmark=-0.4)
+        flags = _flag_underperforming_benchmark([asset])
         assert len(flags) == 1
         assert "ARZZ3" in flags[0]
+        assert "Ibovespa" in flags[0]
 
-    def test_no_flag_above_cdi(self):
-        asset = make_asset(monthly_return_pct=2.0, monthly_vs_cdi=1.0)
-        assert _flag_underperforming_cdi([asset]) == []
+    def test_flags_fixed_income_below_cdi(self):
+        asset = make_asset(name="CDB Banco X", asset_class="renda_fixa", benchmark="CDI",
+                           monthly_return_pct=0.5, monthly_vs_benchmark=-0.3)
+        flags = _flag_underperforming_benchmark([asset])
+        assert len(flags) == 1
+        assert "CDI" in flags[0]
+
+    def test_no_flag_above_benchmark(self):
+        asset = make_asset(monthly_return_pct=2.0, monthly_vs_benchmark=1.0)
+        assert _flag_underperforming_benchmark([asset]) == []
 
     def test_no_flag_when_monthly_return_is_none(self):
-        asset = make_asset(monthly_return_pct=None, monthly_vs_cdi=None)
-        assert _flag_underperforming_cdi([asset]) == []
+        asset = make_asset(monthly_return_pct=None, monthly_vs_benchmark=None)
+        assert _flag_underperforming_benchmark([asset]) == []
 
 
 # --- generate_flags (integration of all rules) ---
@@ -118,15 +128,16 @@ class TestFlagUnderperformingCdi:
 class TestGenerateFlags:
     def test_combines_all_flag_types(self):
         assets = [
-            make_asset(name="HAPV3", return_since_inception_pct=-74.58, monthly_return_pct=0.3, monthly_vs_cdi=-0.6),
+            make_asset(name="HAPV3", return_since_inception_pct=-74.58,
+                       monthly_return_pct=0.3, monthly_vs_benchmark=-0.6),
         ]
         allocation_status = [
             make_status(asset_class="acoes", current_pct=0.05, target_pct=0.20, gap_pct=-0.15),
         ]
-        flags = generate_flags(assets, allocation_status, cdi_monthly_pct=0.89)
+        flags = generate_flags(assets, allocation_status)
         assert any("HAPV3" in f and "-74" in f for f in flags)
         assert any("acoes" in f and "abaixo" in f for f in flags)
-        assert any("HAPV3" in f and "CDI" in f for f in flags)
+        assert any("HAPV3" in f and "Ibovespa" in f for f in flags)
 
     def test_empty_inputs_return_no_flags(self):
-        assert generate_flags([], [], cdi_monthly_pct=0.89) == []
+        assert generate_flags([], []) == []

@@ -30,10 +30,12 @@ def make_analysis() -> PortfolioAnalysis:
         assets=[
             AssetReturn(name="HAPV3", asset_class="acoes", allocation_pct=1.97,
                         monthly_return_pct=76.4, return_since_inception_pct=-74.58,
-                        monthly_vs_cdi=75.5, investment_date="02/11/2022"),
+                        monthly_vs_benchmark=75.5, benchmark="Ibovespa",
+                        investment_date="02/11/2022"),
             AssetReturn(name="Riza Lotus", asset_class="renda_fixa", allocation_pct=30.81,
                         monthly_return_pct=None, return_since_inception_pct=15.51,
-                        monthly_vs_cdi=None, investment_date="22/04/2021"),
+                        monthly_vs_benchmark=None, benchmark="CDI",
+                        investment_date="22/04/2021"),
         ],
         portfolio_monthly_return_pct=None,
         cdi_monthly_pct=0.89,
@@ -110,23 +112,23 @@ def _mock_text(text: str):
 
 class TestBuildRecMessage:
     def test_includes_portfolio_analysis(self):
-        msg = build_rec_message(make_analysis(), make_risk_profile(), make_macro())
+        msg = build_rec_message(make_analysis(), make_risk_profile(), make_macro(), watchlist=[])
         data = json.loads(msg)
         assert "portfolio_analysis" in data
         assert data["portfolio_analysis"]["client_name"] == "Albert da Silva"
 
     def test_includes_risk_profile(self):
-        msg = build_rec_message(make_analysis(), make_risk_profile(), make_macro())
+        msg = build_rec_message(make_analysis(), make_risk_profile(), make_macro(), watchlist=[])
         data = json.loads(msg)
         assert data["risk_profile"]["classification"] == "Moderado"
 
     def test_includes_macro_projections(self):
-        msg = build_rec_message(make_analysis(), make_risk_profile(), make_macro())
+        msg = build_rec_message(make_analysis(), make_risk_profile(), make_macro(), watchlist=[])
         data = json.loads(msg)
         assert data["macro_context"]["projections"]["selic_terminal"] == 15.5
 
     def test_includes_key_points(self):
-        msg = build_rec_message(make_analysis(), make_risk_profile(), make_macro())
+        msg = build_rec_message(make_analysis(), make_risk_profile(), make_macro(), watchlist=[])
         data = json.loads(msg)
         assert len(data["macro_context"]["key_points"]) == 2
 
@@ -161,10 +163,10 @@ class TestGenerateRecommendations:
         assert len(result.observations) > 0
 
     @patch("src.llm.recommendations.client")
-    def test_uses_gpt4o(self, mock_client):
+    def test_uses_gpt54(self, mock_client):
         mock_client.beta.chat.completions.parse.return_value = _mock_parsed(make_recommendations())
         generate_recommendations(make_analysis(), make_risk_profile(), make_macro())
-        assert mock_client.beta.chat.completions.parse.call_args.kwargs["model"] == "gpt-4o"
+        assert mock_client.beta.chat.completions.parse.call_args.kwargs["model"] == "gpt-5.4"
 
     @patch("src.llm.recommendations.client")
     def test_uses_recommendations_system_prompt(self, mock_client):
@@ -186,10 +188,10 @@ class TestWriteLetter:
         assert len(result) > 0
 
     @patch("src.llm.writer.client")
-    def test_uses_gpt4o(self, mock_client):
+    def test_uses_gpt41(self, mock_client):
         mock_client.chat.completions.create.return_value = _mock_text("Prezado Albert...")
         write_letter(make_recommendations(), make_analysis())
-        assert mock_client.chat.completions.create.call_args.kwargs["model"] == "gpt-4o"
+        assert mock_client.chat.completions.create.call_args.kwargs["model"] == "gpt-4.1"
 
     @patch("src.llm.writer.client")
     def test_uses_writer_system_prompt(self, mock_client):

@@ -28,6 +28,13 @@ _CVM_CLASS_MAP: list[tuple[str, str]] = [
 ]
 
 
+_EQUITY_CLASSES = frozenset({"acoes", "fundos_acoes"})
+
+
+def _benchmark_for_class(asset_class: str) -> str:
+    return "Ibovespa" if asset_class in _EQUITY_CLASSES else "CDI"
+
+
 def classify_fund(fund_name: str, cvm_class: str | None = None) -> str:
     """Returns the internal asset class for a fund.
 
@@ -143,6 +150,8 @@ def analyze_portfolio(
     # Build asset returns
     assets: list[AssetReturn] = []
 
+    ibov = benchmarks.ibovespa_monthly_pct
+
     for stock in portfolio.stocks:
         market = stock_data.get(stock.ticker)
         monthly = market.monthly_return_pct if market else None
@@ -152,7 +161,8 @@ def analyze_portfolio(
             allocation_pct=stock.allocation_pct,
             monthly_return_pct=monthly,
             return_since_inception_pct=stock.return_since_inception_pct,
-            monthly_vs_cdi=round(monthly - cdi, 4) if monthly is not None else None,
+            monthly_vs_benchmark=round(monthly - ibov, 4) if monthly is not None else None,
+            benchmark="Ibovespa",
             investment_date=stock.investment_date,
         ))
 
@@ -160,13 +170,17 @@ def analyze_portfolio(
         market = fund_data.get(fund.name)
         monthly = market.monthly_return_pct if market else None
         cvm_class = market.cvm_class if market else None
+        asset_class = classify_fund(fund.name, cvm_class)
+        benchmark = _benchmark_for_class(asset_class)
+        bval = ibov if benchmark == "Ibovespa" else cdi
         assets.append(AssetReturn(
             name=fund.name,
-            asset_class=classify_fund(fund.name, cvm_class),
+            asset_class=asset_class,
             allocation_pct=fund.allocation_pct,
             monthly_return_pct=monthly,
             return_since_inception_pct=fund.return_since_inception_pct,
-            monthly_vs_cdi=round(monthly - cdi, 4) if monthly is not None else None,
+            monthly_vs_benchmark=round(monthly - bval, 4) if monthly is not None else None,
+            benchmark=benchmark,
             investment_date=fund.investment_date,
         ))
 
@@ -187,7 +201,8 @@ def analyze_portfolio(
             return_since_inception_pct=round(
                 (fi.position_value - fi.invested_amount) / fi.invested_amount * 100, 2
             ),
-            monthly_vs_cdi=round(monthly - cdi, 4),
+            monthly_vs_benchmark=round(monthly - cdi, 4),
+            benchmark="CDI",
             investment_date=fi.investment_date,
         ))
 
@@ -200,7 +215,7 @@ def analyze_portfolio(
     inv_balance = _investable_balance(portfolio, buffer_pct)
 
     # Flags
-    flags = generate_flags(assets, allocation_status, cdi)
+    flags = generate_flags(assets, allocation_status)
 
     return PortfolioAnalysis(
         client_name=portfolio.client_name,

@@ -141,6 +141,12 @@ def _report_date_header() -> str:
     return f"{_MONTH_PT[now.month].upper()} DE {now.year}"
 
 
+def _report_month_year_pt() -> str:
+    """Return current month and year in lowercase Portuguese, e.g. 'maio de 2026'."""
+    now = datetime.now()
+    return f"{_MONTH_PT[now.month]} de {now.year}"
+
+
 def _make_env() -> Environment:
     return Environment(loader=FileSystemLoader(str(_TEMPLATE_DIR)), autoescape=True)
 
@@ -201,6 +207,7 @@ def generate_advisor_report(
     html_content = template.render(
         logo_b64=_logo_base64(),
         reference_month=analysis.reference_month,
+        report_month_year=_report_month_year_pt(),
         client_name=analysis.client_name,
         account=analysis.client_name,  # account not on PortfolioAnalysis; use name
         advisor_name=analysis.advisor_name,

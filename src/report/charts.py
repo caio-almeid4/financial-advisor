@@ -14,6 +14,7 @@ _DARK   = "#1A1A1A"
 _GREEN  = "#1A7A40"
 _AMBER  = "#E67E22"
 _RED    = "#C0392B"
+_BLUE   = "#1565C0"
 _GRID   = "#EBEBEB"
 _TEXT   = "#2D2D2D"
 _MUTED  = "#888888"
@@ -122,7 +123,7 @@ def allocation_chart(analysis: PortfolioAnalysis) -> str:
 
 
 def returns_chart(analysis: PortfolioAnalysis) -> str:
-    """Horizontal bars colored by performance vs CDI — returns inline SVG."""
+    """Horizontal bars (green=positive, red=negative) with CDI and Ibovespa reference lines."""
     assets = sorted(
         [a for a in analysis.assets if a.monthly_return_pct is not None],
         key=lambda a: a.monthly_return_pct or 0,
@@ -135,30 +136,26 @@ def returns_chart(analysis: PortfolioAnalysis) -> str:
             "Sem dados de retorno mensal disponíveis.</text></svg>"
         )
 
-    cdi = analysis.cdi_monthly_pct
-    n   = len(assets)
+    cdi  = analysis.cdi_monthly_pct
+    ibov = analysis.ibovespa_monthly_pct
+    n    = len(assets)
 
     W, LABEL_W, RIGHT_M = 680, 215, 10
-    TOP_M, BOT_M = 34, 22
+    TOP_M, BOT_M = 46, 22
     ROW_H, BAR_H = 38, 16
     H = TOP_M + n * ROW_H + BOT_M
 
     chart_w = W - LABEL_W - RIGHT_M
-    values   = [a.monthly_return_pct for a in assets]
-    all_abs  = [abs(v) for v in values]
-    ref      = sorted(all_abs)[-2] if len(all_abs) > 1 else all_abs[0]
-    x_max    = max(ref * 2.2, cdi * 6, 4.0)
-    neg      = [v for v in values if v < 0]
-    x_min    = min(min(neg) * 1.5, -cdi * 1.5) if neg else -x_max * 0.08
-    x_range  = x_max - x_min
+    values  = [a.monthly_return_pct for a in assets]
+    all_abs = [abs(v) for v in values]
+    ref     = sorted(all_abs)[-2] if len(all_abs) > 1 else all_abs[0]
+    x_max   = max(ref * 2.2, cdi * 6, abs(ibov) * 2.2, 4.0)
+    neg     = [v for v in values if v < 0] + ([ibov] if ibov < 0 else [])
+    x_min   = min(min(neg) * 1.5, -cdi * 1.5) if neg else -x_max * 0.08
+    x_range = x_max - x_min
 
     def px(v: float) -> float:
         return LABEL_W + (v - x_min) / x_range * chart_w
-
-    def bar_color(v: float) -> str:
-        if v < 0:     return _RED
-        if v >= cdi:  return _GREEN
-        return _AMBER
 
     out = [
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" '
@@ -166,11 +163,10 @@ def returns_chart(analysis: PortfolioAnalysis) -> str:
         f'font-family:Inter,Helvetica,Arial,sans-serif">'
     ]
 
-    # Legend — top row, same style as allocation chart
+    # Legend
     lx = LABEL_W + 4
-    for color, lbl, offset in [(_GREEN, "Acima do CDI", 0),
-                                (_AMBER, "Positivo, abaixo do CDI", 108),
-                                (_RED, "Retorno negativo", 258)]:
+    for color, lbl, offset in [(_GREEN, "Retorno positivo", 0),
+                                (_RED,   "Retorno negativo", 118)]:
         ox = lx + offset
         out.append(
             f'<rect x="{ox}" y="4" width="9" height="9" rx="2" fill="{color}"/>'
@@ -197,7 +193,19 @@ def returns_chart(analysis: PortfolioAnalysis) -> str:
         f'y2="{TOP_M + n * ROW_H}" stroke="#CCCCCC" stroke-width="0.8"/>'
     )
 
-    # CDI reference line + label (inside chart area, above first bar)
+    # Ibovespa reference line + label (drawn first so CDI label renders on top if they overlap)
+    ix = px(ibov)
+    out.append(
+        f'<line x1="{ix:.1f}" y1="{TOP_M}" x2="{ix:.1f}" '
+        f'y2="{TOP_M + n * ROW_H}" stroke="{_BLUE}" stroke-width="1.5" '
+        f'stroke-dasharray="4,3"/>'
+    )
+    out.append(
+        f'<text x="{ix:.1f}" y="{TOP_M - 16}" text-anchor="middle" '
+        f'font-size="8" fill="{_BLUE}" font-weight="700">Ibov {ibov:+.2f}%</text>'
+    )
+
+    # CDI reference line + label
     cx = px(cdi)
     out.append(
         f'<line x1="{cx:.1f}" y1="{TOP_M}" x2="{cx:.1f}" '
@@ -224,7 +232,7 @@ def returns_chart(analysis: PortfolioAnalysis) -> str:
         x_bar = px(min(clipped, 0))
         x_end = px(max(clipped, 0))
         bw    = max(x_end - x_bar, 1.0)
-        color = bar_color(v)
+        color = _GREEN if v >= 0 else _RED
 
         out.append(
             f'<rect x="{x_bar:.1f}" y="{y_bar}" width="{bw:.1f}" '

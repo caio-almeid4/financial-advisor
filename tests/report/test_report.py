@@ -30,10 +30,12 @@ def make_analysis() -> PortfolioAnalysis:
         assets=[
             AssetReturn(name="LREN3", asset_class="acoes", allocation_pct=5.0,
                         monthly_return_pct=2.3, return_since_inception_pct=-10.0,
-                        monthly_vs_cdi=1.4, investment_date="22/04/2021"),
+                        monthly_vs_benchmark=1.4, benchmark="Ibovespa",
+                        investment_date="22/04/2021"),
             AssetReturn(name="Riza Lotus Advisory", asset_class="renda_fixa", allocation_pct=30.0,
                         monthly_return_pct=None, return_since_inception_pct=15.5,
-                        monthly_vs_cdi=None, investment_date="22/04/2021"),
+                        monthly_vs_benchmark=None, benchmark="CDI",
+                        investment_date="22/04/2021"),
         ],
         portfolio_monthly_return_pct=None,
         cdi_monthly_pct=0.89,
@@ -98,9 +100,10 @@ class TestReturnsChart:
         assert svg.startswith("<svg")
         assert "</svg>" in svg
 
-    def test_contains_cdi_reference(self):
+    def test_contains_cdi_and_ibov_reference(self):
         svg = returns_chart(make_analysis())
         assert "CDI" in svg
+        assert "Ibov" in svg
 
 
 # --- generator helpers ---

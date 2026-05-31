@@ -7,8 +7,9 @@ class AssetReturn(BaseModel):
     allocation_pct: float
     monthly_return_pct: float | None  # None for Advisory funds (no CVM data)
     return_since_inception_pct: float
-    monthly_vs_cdi: float | None  # monthly_return - cdi_monthly; None if no monthly data
-    investment_date: str           # "DD/MM/YYYY" from source asset
+    monthly_vs_benchmark: float | None  # monthly_return - benchmark; None if no monthly data
+    benchmark: str                      # "CDI" or "Ibovespa"
+    investment_date: str                # "DD/MM/YYYY" from source asset
 
 
 class AllocationStatus(BaseModel):

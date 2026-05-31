@@ -156,7 +156,8 @@ def make_asset(monthly_return_pct, allocation_pct) -> AssetReturn:
         allocation_pct=allocation_pct,
         monthly_return_pct=monthly_return_pct,
         return_since_inception_pct=0.0,
-        monthly_vs_cdi=None,
+        monthly_vs_benchmark=None,
+        benchmark="CDI",
         investment_date="01/01/2024",
     )
 

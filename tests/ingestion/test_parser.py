@@ -103,7 +103,7 @@ class TestParsePortfolio:
         mock_client.beta.chat.completions.parse.return_value = _mock_parsed_response(SAMPLE_PORTFOLIO)
         parse_portfolio(_INPUTS / "portfolio.txt")
         call_kwargs = mock_client.beta.chat.completions.parse.call_args
-        assert call_kwargs.kwargs["model"] == "gpt-4o-mini"
+        assert call_kwargs.kwargs["model"] == "gpt-5.4-mini"
 
     @patch("src.ingestion.parser.client")
     @patch("src.ingestion.parser.read_input", return_value="portfolio text")
