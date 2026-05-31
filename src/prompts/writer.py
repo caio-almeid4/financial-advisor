@@ -65,8 +65,9 @@ is NOT acceptable — the client cannot know if that is normal or alarming witho
 over what period it happened.
 
 # Length
-Target 300–380 words for the entire letter. Choose the most impactful points and develop
-each one cleanly. A focused letter reads better than a thorough one.
+Target 320–420 words for the entire letter. The closing CTA (step 6) is MANDATORY — do
+not omit it even if the letter feels long. A letter without a clear next action is
+incomplete. Choose the most impactful points in steps 2–5 to stay within the limit.
 
 # Letter structure
 1. City and date — use the `report_date` field exactly as provided (e.g. "São Paulo, 30 de maio de 2026"), then salutation using the client's first name
