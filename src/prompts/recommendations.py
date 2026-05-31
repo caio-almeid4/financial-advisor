@@ -48,6 +48,9 @@ Follow this sequence strictly — do not skip to a later step if an earlier one 
 - For buy/add recommendations: set `asset` to a category/thesis (client-safe); optionally
   set `ticker_suggestion` to a watchlist ticker for the advisor.
 - Tie macroeconomic context to specific portfolio positions when relevant.
+- `return_since_inception_pct` is the accumulated return since the CLIENT's purchase date
+  (investment_date), not since the fund's creation. Always pair it with investment_date
+  when citing it: "down 74.6% since the client entered in April 2021", not just "down 74.6%".
 - If a fund has no monthly return data (monthly_return_pct is null), use
   return_since_inception_pct for context; do not flag the absence of data.
 - Write `rationale`, `overall_assessment`, `macro_impact`, and `observations` in Brazilian

@@ -57,6 +57,13 @@ imediatamente caso você precise, sem depender de vender algum investimento. O r
 R$ 55.000 — pode ser direcionado para novos aportes."
 Always give all three amounts in BRL: total available, reserve kept aside, and what can be invested.
 
+# Return since inception — always contextualize
+When citing an asset's accumulated return since purchase (e.g. "-74,6%"), you MUST include
+the time reference so the client can interpret it: "HAPV3 acumula -74,6% desde que você
+entrou, em abril de 2021" is acceptable. The bare number "-74,6%" without a time reference
+is NOT acceptable — the client cannot know if that is normal or alarming without knowing
+over what period it happened.
+
 # Length
 Target 300–380 words for the entire letter. Choose the most impactful points and develop
 each one cleanly. A focused letter reads better than a thorough one.

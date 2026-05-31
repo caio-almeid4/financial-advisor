@@ -194,7 +194,7 @@ def generate_report(
     pdf_path = out / f"report_{client_slug}_{month_slug}.pdf"
 
     ipca_monthly, _ = _format_pct(analysis.ipca_monthly_pct)
-    cdi_monthly, _ = _format_pct(analysis.cdi_monthly_pct)
+    cdi_monthly, cdi_class = _format_pct(analysis.cdi_monthly_pct)
     ibovespa_monthly, ibov_class = _format_pct(analysis.ibovespa_monthly_pct)
 
     template = _make_env().get_template("template.html")
@@ -208,6 +208,7 @@ def generate_report(
         total_invested=_format_brl(analysis.total_invested),
         ipca_monthly=ipca_monthly,
         cdi_monthly=cdi_monthly,
+        cdi_class=cdi_class,
         ibovespa_monthly=ibovespa_monthly,
         ibov_class=ibov_class,
         letter_paragraphs=_split_paragraphs(letter),
