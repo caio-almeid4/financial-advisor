@@ -258,30 +258,23 @@ def get_benchmarks(year: int, month: int) -> BenchmarkData:
 # --- Watchlist ---
 
 def load_watchlist(csv_path: Path, year: int, month: int) -> list[dict]:
-    """Load advisor watchlist CSV and enrich each ticker with live yfinance data.
+    """Load advisor watchlist CSV (XP export format) and enrich with live yfinance data.
 
-    Supports two formats (auto-detected by header):
-
-    Format A — XP portfolio export:
+    Expected format:
         Asset class,Asset,Current price,Last month price
         Stocks,ITUB4,27.8,26.9
 
-    Format B — simple advisor list:
-        ticker,thesis
-        ITUB4,Banco sólido com dividendos consistentes
-
     CSV prices are ignored — monthly_return_pct always comes from yfinance so
     watchlist returns are consistent with the portfolio data in the same report.
+    Rows with missing or unrecognised ticker are skipped silently.
     """
     items: list[dict] = []
     with open(csv_path, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
-        headers = reader.fieldnames or []
-        is_xp_format = "Asset" in headers
-
         for row in reader:
-            ticker = (row["Asset"] if is_xp_format else row["ticker"]).strip()
-            thesis = row.get("thesis", "").strip() or None
+            ticker = (row.get("Asset") or "").strip()
+            if not ticker:
+                continue
             try:
                 data = get_stock_monthly_data(ticker, year, month)
                 monthly_return = data.monthly_return_pct
@@ -290,6 +283,6 @@ def load_watchlist(csv_path: Path, year: int, month: int) -> list[dict]:
             items.append({
                 "ticker": ticker,
                 "monthly_return_pct": monthly_return,
-                "thesis": thesis,
+                "thesis": None,
             })
     return items
