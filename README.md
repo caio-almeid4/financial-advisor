@@ -92,6 +92,10 @@ flowchart TD
 ## Setup
 
 ```bash
+# Clone the repo and enter the directory
+git clone https://github.com/caio-almeid4/financial-advisor.git
+cd financial-advisor
+
 # Install dependencies
 uv sync
 
